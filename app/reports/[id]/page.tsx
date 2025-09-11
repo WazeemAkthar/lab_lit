@@ -94,13 +94,22 @@ export default function ReportDetailsPage() {
   }
 
   const renderFBCResults = (fbcResults: any[]) => {
-    return (
-      <div key="FBC" className="border rounded-lg p-6">
-        <div className="flex items-center gap-2 mb-6">
-          <Badge variant="outline" className="text-lg px-3 py-1">FBC</Badge>
-          <span className="font-semibold text-lg">Full Blood Count</span>
-        </div>
-        
+    // Categorize the FBC results
+    const mainParams = fbcResults.filter(result => 
+      ['Hemoglobin', 'RBC', 'PCV', 'MCV', 'MCH', 'MCHC', 'RDW-CV', 'Platelets', 'WBC'].includes(result.testName)
+    )
+    
+    const differentialCount = fbcResults.filter(result => 
+      ['Neutrophils', 'Lymphocytes', 'Eosinophils', 'Monocytes', 'Basophils'].includes(result.testName)
+    )
+    
+    const absoluteCount = fbcResults.filter(result => 
+      ['Neutrophils (Abs)', 'Lymphocytes (Abs)', 'Eosinophils (Abs)', 'Monocytes (Abs)', 'Basophils (Abs)'].includes(result.testName)
+    )
+
+    const renderTable = (results: any[], title?: string) => (
+      <div className="mb-6">
+        {title && <h4 className="font-medium text-sm text-muted-foreground mb-3">{title}</h4>}
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -113,8 +122,15 @@ export default function ReportDetailsPage() {
               </tr>
             </thead>
             <tbody>
-              {fbcResults.map((result, index) => {
-                const isNormal = checkIfNormal(result.value, result.referenceRange, result.unit)
+              {results.map((result, index) => {
+                const status = checkValueStatus(result.value, result.referenceRange)
+                const getStatusDisplay = (status: string) => {
+                  if (status === 'low') return { text: 'L', variant: 'destructive' as const }
+                  if (status === 'high') return { text: 'H', variant: 'destructive' as const }
+                  return { text: '', variant: 'default' as const }
+                }
+                const statusDisplay = getStatusDisplay(status)
+                
                 return (
                   <tr key={index} className="border-b border-gray-100">
                     <td className="py-2 font-medium">{result.testName}</td>
@@ -122,9 +138,11 @@ export default function ReportDetailsPage() {
                     <td className="text-right py-2 text-muted-foreground">{result.unit}</td>
                     <td className="text-right py-2 text-muted-foreground">{result.referenceRange}</td>
                     <td className="text-center py-2">
-                      <Badge variant={isNormal ? "default" : "destructive"} className="text-xs">
-                        {isNormal ? "Normal" : "Abnormal"}
-                      </Badge>
+                      {statusDisplay.text && (
+                        <Badge variant={statusDisplay.variant} className="text-xs font-bold">
+                          {statusDisplay.text}
+                        </Badge>
+                      )}
                     </td>
                   </tr>
                 )
@@ -132,6 +150,21 @@ export default function ReportDetailsPage() {
             </tbody>
           </table>
         </div>
+      </div>
+    )
+
+    return (
+      <div key="FBC" className="border rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-6">
+          <Badge variant="outline" className="text-lg px-3 py-1">FBC</Badge>
+          <span className="font-semibold text-lg">Full Blood Count</span>
+        </div>
+        
+        {mainParams.length > 0 && renderTable(mainParams)}
+        {mainParams.length > 0 && differentialCount.length > 0 && <hr className="my-4 border-gray-200" />}
+        {differentialCount.length > 0 && renderTable(differentialCount, "Differential Count")}
+        {differentialCount.length > 0 && absoluteCount.length > 0 && <hr className="my-4 border-gray-200" />}
+        {absoluteCount.length > 0 && renderTable(absoluteCount, "Absolute Count")}
       </div>
     )
   }
@@ -177,21 +210,23 @@ export default function ReportDetailsPage() {
     )
   }
 
-  const checkIfNormal = (value: string, referenceRange: string, unit: string) => {
-    // Simple normal range checker - you can enhance this logic
-    if (!value || !referenceRange) return true
+  const checkValueStatus = (value: string, referenceRange: string) => {
+    // Returns 'normal', 'low', or 'high'
+    if (!value || !referenceRange) return 'normal'
     
     const numValue = parseFloat(value)
-    if (isNaN(numValue)) return true
+    if (isNaN(numValue)) return 'normal'
     
     // Extract range like "12.0-16.0" or "4.0-11.0"
     const rangeMatch = referenceRange.match(/(\d+\.?\d*)-(\d+\.?\d*)/)
-    if (!rangeMatch) return true
+    if (!rangeMatch) return 'normal'
     
     const minValue = parseFloat(rangeMatch[1])
     const maxValue = parseFloat(rangeMatch[2])
     
-    return numValue >= minValue && numValue <= maxValue
+    if (numValue < minValue) return 'low'
+    if (numValue > maxValue) return 'high'
+    return 'normal'
   }
 
 
@@ -220,12 +255,43 @@ export default function ReportDetailsPage() {
     <DashboardLayout>
       <style jsx global>{`
         @media print {
-          body { font-size: 12px; }
+          body { font-size: 10px; }
           .no-print { display: none !important; }
           .print-break { page-break-after: always; }
           @page { 
-            margin: 1in; 
+            margin: 0.7in; 
             size: A4;
+          }
+          table { 
+            font-size: 8px;
+            border-collapse: collapse;
+            width: 100%;
+          }
+          th, td {
+            padding: 2px 4px;
+            border: 1px solid #ddd;
+          }
+          th {
+            background-color: #f5f5f5 !important;
+            font-weight: bold;
+          }
+          h1, h2, h3 {
+            font-size: 14px;
+            margin: 8px 0 4px 0;
+          }
+          h4 {
+            font-size: 10px;
+            margin: 6px 0 3px 0;
+            background-color: #f5f5f5;
+            padding: 2px 4px;
+          }
+          hr {
+            margin: 6px 0;
+            border: 0.5px solid #ccc;
+          }
+          .badge {
+            font-size: 6px !important;
+            padding: 1px 3px !important;
           }
         }
       `}</style>
