@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -48,8 +47,7 @@ export default function NewReportPageSimple() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button asChild variant="outline" size="icon">
             <Link href="/reports">
@@ -95,6 +93,5 @@ export default function NewReportPageSimple() {
           </CardContent>
         </Card>
       </div>
-    </DashboardLayout>
   )
 }

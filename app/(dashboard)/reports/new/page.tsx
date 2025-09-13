@@ -2,9 +2,8 @@
 
 import type React from "react"
 
-import { useState, useEffect, useMemo, useCallback } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -59,7 +58,7 @@ export default function NewReportPage() {
     setLoading(false)
   }, [])
 
-  const handlePatientChange = useCallback((patientId: string) => {
+  const handlePatientChange = (patientId: string) => {
     const patient = patients.find((p) => p.id === patientId)
     setSelectedPatient(patient || null)
     setSelectedInvoice(null)
@@ -67,9 +66,9 @@ export default function NewReportPage() {
     setUseDirectTestSelection(false)
     setResults([])
     setFbcValues(null)
-  }, [patients])
+  }
 
-  const handleInvoiceChange = useCallback((invoiceId: string) => {
+  const handleInvoiceChange = (invoiceId: string) => {
     const invoice = invoices.find((inv) => inv.id === invoiceId)
     setSelectedInvoice(invoice || null)
     setFbcValues(null)
@@ -119,25 +118,25 @@ export default function NewReportPage() {
 
       setResults(initialResults)
     }
-  }, [invoices])
+  }
 
   const updateResult = (testName: string, field: keyof ReportResult, value: string) => {
     setResults(results.map((result) => (result.testName === testName ? { ...result, [field]: value } : result)))
   }
 
-  const handleFBCValuesChange = useCallback((values: any) => {
+  const handleFBCValuesChange = (values: any) => {
     setFbcValues(values)
-  }, [])
+  }
 
-  const handleDirectTestSelection = useCallback(() => {
+  const handleDirectTestSelection = () => {
     setUseDirectTestSelection(true)
     setSelectedInvoice(null)
     setResults([])
     setFbcValues(null)
-  }, [])
+  }
 
-  const handleTestSelection = useCallback((testCodes: string[]) => {
-    // Prevent unnecessary updates if the test selection hasn't actually changed
+  const handleTestSelection = (testCodes: string[]) => {
+    // Prevent infinite loops by checking if the selection has actually changed
     if (JSON.stringify(testCodes.sort()) === JSON.stringify(selectedTests.sort())) {
       return
     }
@@ -186,7 +185,7 @@ export default function NewReportPage() {
     })
 
     setResults(initialResults)
-  }, [selectedTests])
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -252,7 +251,7 @@ export default function NewReportPage() {
     }
   }
 
-  const isFormValid = useMemo(() => {
+  const isFormValid = () => {
     const hasRegularResults = results.some((r) => r.value.trim() !== "")
     const hasFBC = useDirectTestSelection 
       ? selectedTests.includes('FBC')
@@ -260,19 +259,15 @@ export default function NewReportPage() {
     const hasFBCResults = fbcValues && hasFBC && Object.values(fbcValues).some(v => v && String(v).trim() !== "")
     const hasValidSelection = selectedInvoice || (useDirectTestSelection && selectedTests.length > 0)
     return selectedPatient && hasValidSelection && (hasRegularResults || hasFBCResults) && reviewedBy.trim() !== ""
-  }, [selectedPatient, selectedInvoice, useDirectTestSelection, selectedTests, results, fbcValues, reviewedBy])
+  }
 
-  // Check if FBC test is selected - use useMemo to prevent recalculation
-  const hasFBCTest = useMemo(() => {
-    return useDirectTestSelection 
-      ? selectedTests.includes('FBC')
-      : selectedInvoice?.lineItems.some(item => item.testCode === 'FBC') || false
-  }, [useDirectTestSelection, selectedTests, selectedInvoice])
+  // Check if FBC test is selected
+  const hasFBCTest = useDirectTestSelection 
+    ? selectedTests.includes('FBC')
+    : selectedInvoice?.lineItems.some(item => item.testCode === 'FBC') || false
 
-  // Memoize patient invoices to prevent recalculation
-  const patientInvoices = useMemo(() => {
-    return selectedPatient ? invoices.filter((inv) => inv.patientId === selectedPatient.id) : []
-  }, [selectedPatient, invoices])
+  // Get patient invoices
+  const patientInvoices = selectedPatient ? invoices.filter((inv) => inv.patientId === selectedPatient.id) : []
 
   if (loading || !isAuthenticated) {
     return (
@@ -283,8 +278,7 @@ export default function NewReportPage() {
   }
 
   return (
-    <DashboardLayout>
-      <div className="space-y-6">
+    <div className="space-y-6">
         <div className="flex items-center gap-4">
           <Button asChild variant="outline" size="icon">
             <Link href="/reports">
@@ -443,7 +437,7 @@ export default function NewReportPage() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {results.map((result, index) => (
-                      <div key={`${result.testCode}-${index}`} className="p-4 border rounded-lg space-y-4">
+                      <div key={`${result.testCode}-${result.testName}-${index}`} className="p-4 border rounded-lg space-y-4">
                         <div className="flex items-center gap-2 mb-3">
                           <Badge variant="outline">{result.testCode}</Badge>
                           <span className="font-medium">{result.testName}</span>
@@ -451,9 +445,9 @@ export default function NewReportPage() {
 
                         <div className="grid gap-4 md:grid-cols-3">
                           <div className="space-y-2">
-                            <Label htmlFor={`value-${result.testCode}-${index}`}>Result Value *</Label>
+                            <Label htmlFor={`value-${result.testCode}-${result.testName}-${index}`}>Result Value *</Label>
                             <Input
-                              id={`value-${result.testCode}-${index}`}
+                              id={`value-${result.testCode}-${result.testName}-${index}`}
                               value={result.value}
                               onChange={(e) => updateResult(result.testName, "value", e.target.value)}
                               placeholder="Enter result value"
@@ -461,9 +455,9 @@ export default function NewReportPage() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor={`unit-${result.testCode}-${index}`}>Unit</Label>
+                            <Label htmlFor={`unit-${result.testCode}-${result.testName}-${index}`}>Unit</Label>
                             <Input
-                              id={`unit-${result.testCode}-${index}`}
+                              id={`unit-${result.testCode}-${result.testName}-${index}`}
                               value={result.unit}
                               onChange={(e) => updateResult(result.testName, "unit", e.target.value)}
                               placeholder="e.g., mg/dL, %"
@@ -471,9 +465,9 @@ export default function NewReportPage() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label htmlFor={`range-${result.testCode}-${index}`}>Reference Range</Label>
+                            <Label htmlFor={`range-${result.testCode}-${result.testName}-${index}`}>Reference Range</Label>
                             <Input
-                              id={`range-${result.testCode}-${index}`}
+                              id={`range-${result.testCode}-${result.testName}-${index}`}
                               value={result.referenceRange}
                               onChange={(e) => updateResult(result.testName, "referenceRange", e.target.value)}
                               placeholder="e.g., 70-100 mg/dL"
@@ -482,9 +476,9 @@ export default function NewReportPage() {
                         </div>
 
                         <div className="space-y-2">
-                          <Label htmlFor={`comments-${result.testCode}-${index}`}>Comments (Optional)</Label>
+                          <Label htmlFor={`comments-${result.testCode}-${result.testName}-${index}`}>Comments (Optional)</Label>
                           <Textarea
-                            id={`comments-${result.testCode}-${index}`}
+                            id={`comments-${result.testCode}-${result.testName}-${index}`}
                             value={result.comments || ""}
                             onChange={(e) => updateResult(result.testName, "comments", e.target.value)}
                             placeholder="Any additional comments about this result"
@@ -537,7 +531,7 @@ export default function NewReportPage() {
 
           {/* Form Actions */}
           <div className="flex items-center gap-4">
-            <Button type="submit" disabled={!isFormValid || saving} className="min-w-[120px]">
+            <Button type="submit" disabled={!isFormValid() || saving} className="min-w-[120px]">
               <Save className="h-4 w-4 mr-2" />
               {saving ? "Generating..." : "Generate Report"}
             </Button>
@@ -549,6 +543,5 @@ export default function NewReportPage() {
           </div>
         </form>
       </div>
-    </DashboardLayout>
   )
 }

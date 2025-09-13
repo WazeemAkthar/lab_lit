@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from "react"
 import { useParams, useRouter } from "next/navigation"
-import { DashboardLayout } from "@/components/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -246,19 +245,17 @@ export default function ReportDetailsPage() {
 
   if (!report) {
     return (
-      <DashboardLayout>
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">Report Not Found</h1>
-          <Button asChild>
-            <Link href="/reports">Back to Reports</Link>
-          </Button>
-        </div>
-      </DashboardLayout>
+      <div className="text-center py-12">
+        <h1 className="text-2xl font-bold mb-4">Report Not Found</h1>
+        <Button asChild>
+          <Link href="/reports">Back to Reports</Link>
+        </Button>
+      </div>
     )
   }
 
   return (
-    <DashboardLayout>
+    <div>
       <style jsx global>{`
         @media print {
           body { 
@@ -627,6 +624,6 @@ export default function ReportDetailsPage() {
         </Card>
 
       </div>
-    </DashboardLayout>
+    </div>
   )
 }
