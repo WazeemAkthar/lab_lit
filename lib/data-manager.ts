@@ -1,76 +1,77 @@
 // Data management utilities for localStorage persistence
 export interface Patient {
-  name: string
-  id: string
-  firstName: string
-  lastName: string
-  age: number
-  gender: "Male" | "Female" | "Other"
-  phone: string
-  email: string
-  doctorName: string
-  notes: string
-  createdAt: string
+  name: string;
+  id: string;
+  firstName: string;
+  lastName: string;
+  age: number;
+  gender: "Male" | "Female" | "Other";
+  phone: string;
+  email: string;
+  doctorName: string;
+  notes: string;
+  createdAt: string;
 }
 
 export interface TestCatalogItem {
-  code: string
-  name: string
-  defaultPrice: number
-  estimatedCost: number
-  unit: string
-  referenceRange: Record<string, string>
-  category: string
+  code: string;
+  name: string;
+  defaultPrice: number;
+  estimatedCost: number;
+  unit: string;
+  referenceRange: Record<string, string>;
+  category: string;
 }
 
 export interface InvoiceLineItem {
-  testCode: string
-  testName: string
-  quantity: number
-  unitPrice: number
-  total: number
+  testCode: string;
+  testName: string;
+  quantity: number;
+  unitPrice: number;
+  total: number;
 }
 
 export interface Invoice {
-  id: string
-  patientId: string
-  patientName: string
-  lineItems: InvoiceLineItem[]
-  subtotal: number
-  discountPercent: number
-  discountAmount: number
-  grandTotal: number
-  createdAt: string
+  status: string;
+  id: string;
+  patientId: string;
+  patientName: string;
+  lineItems: InvoiceLineItem[];
+  subtotal: number;
+  discountPercent: number;
+  discountAmount: number;
+  grandTotal: number;
+  createdAt: string;
 }
 
 export interface ReportResult {
-  testCode: string
-  testName: string
-  value: string
-  unit: string
-  referenceRange: string
-  comments?: string
+  testCode: string;
+  testName: string;
+  value: string;
+  unit: string;
+  referenceRange: string;
+  comments?: string;
 }
 
 export interface Report {
-  id: string
-  patientId: string
-  patientName: string
-  invoiceId: string | null
-  results: ReportResult[]
-  doctorRemarks?: string
-  reviewedBy: string
-  createdAt: string
+  id: string;
+  patientId: string;
+  patientName: string;
+  invoiceId: string | null;
+  results: ReportResult[];
+  doctorRemarks?: string;
+  reviewedBy: string;
+  createdAt: string;
 }
 
 export class DataManager {
-  private static instance: DataManager
+  private static instance: DataManager;
   private data: {
-    patients: Patient[]
-    invoices: Invoice[]
-    reports: Report[]
-    testCatalog: TestCatalogItem[]
-  }
+    patients: Patient[];
+    invoices: Invoice[];
+    reports: Report[];
+    testCatalog: TestCatalogItem[];
+  };
 
   private constructor() {
     this.data = {
@@ -78,123 +79,135 @@ export class DataManager {
       invoices: [],
       reports: [],
       testCatalog: [],
-    }
-    this.loadData()
+    };
+    this.loadData();
   }
 
   static getInstance(): DataManager {
     if (!DataManager.instance) {
-      DataManager.instance = new DataManager()
+      DataManager.instance = new DataManager();
     }
-    return DataManager.instance
+    return DataManager.instance;
   }
 
   private loadData() {
     try {
-      const stored = localStorage.getItem("lablite_data")
+      const stored = localStorage.getItem("lablite_data");
       if (stored) {
-        this.data = JSON.parse(stored)
+        this.data = JSON.parse(stored);
+
+        // 🔑 Ensure testCatalog always includes new default tests
+        const defaultCatalog: TestCatalogItem[] = this.getTestCatalog();
+        const existingCodes = new Set(this.data.testCatalog.map((t) => t.code));
+
+        defaultCatalog.forEach((test) => {
+          if (!existingCodes.has(test.code)) {
+            this.data.testCatalog.push(test);
+          }
+        });
+
+        this.saveData();
       } else {
-        // Initialize with empty data and load test catalog
-        this.initializeTestCatalog()
+        // Initialize with fresh defaults
+        this.initializeTestCatalog();
       }
     } catch (error) {
-      console.error("Error loading data from localStorage:", error)
-      this.initializeTestCatalog()
+      console.error("Error loading data from localStorage:", error);
+      this.initializeTestCatalog();
     }
   }
 
   private saveData() {
     try {
-      localStorage.setItem("lablite_data", JSON.stringify(this.data))
+      localStorage.setItem("lablite_data", JSON.stringify(this.data));
     } catch (error) {
-      console.error("Error saving data to localStorage:", error)
+      console.error("Error saving data to localStorage:", error);
     }
   }
 
   // Patient methods
   getPatients(): Patient[] {
-    return this.data.patients
+    return this.data.patients;
   }
 
   addPatient(patient: Omit<Patient, "id" | "createdAt">): Patient {
-    const now = new Date()
-    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "")
-    const sequence = String(this.data.patients.length + 1).padStart(4, "0")
+    const now = new Date();
+    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "");
+    const sequence = String(this.data.patients.length + 1).padStart(4, "0");
 
     const newPatient: Patient = {
       ...patient,
       id: `PAT-${dateStr}-${sequence}`,
       createdAt: now.toISOString(),
-    }
+    };
 
-    this.data.patients.push(newPatient)
-    this.saveData()
-    return newPatient
+    this.data.patients.push(newPatient);
+    this.saveData();
+    return newPatient;
   }
 
   getPatientById(id: string): Patient | undefined {
-    return this.data.patients.find((p) => p.id === id)
+    return this.data.patients.find((p) => p.id === id);
   }
 
   // Invoice methods
   getInvoices(): Invoice[] {
-    return this.data.invoices
+    return this.data.invoices;
   }
 
   addInvoice(invoice: Omit<Invoice, "id" | "createdAt">): Invoice {
-    const now = new Date()
-    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "")
-    const sequence = String(this.data.invoices.length + 1).padStart(4, "0")
+    const now = new Date();
+    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "");
+    const sequence = String(this.data.invoices.length + 1).padStart(4, "0");
 
     const newInvoice: Invoice = {
       ...invoice,
       id: `INV-${dateStr}-${sequence}`,
       createdAt: now.toISOString(),
-    }
+    };
 
-    this.data.invoices.push(newInvoice)
-    this.saveData()
-    return newInvoice
+    this.data.invoices.push(newInvoice);
+    this.saveData();
+    return newInvoice;
   }
 
   // Report methods
   getReports(): Report[] {
-    return this.data.reports
+    return this.data.reports;
   }
 
   addReport(report: Omit<Report, "id" | "createdAt">): Report {
-    const now = new Date()
-    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "")
-    const sequence = String(this.data.reports.length + 1).padStart(4, "0")
+    const now = new Date();
+    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "");
+    const sequence = String(this.data.reports.length + 1).padStart(4, "0");
 
     const newReport: Report = {
       ...report,
       id: `REP-${dateStr}-${sequence}`,
       createdAt: now.toISOString(),
-    }
+    };
 
-    this.data.reports.push(newReport)
-    this.saveData()
-    return newReport
+    this.data.reports.push(newReport);
+    this.saveData();
+    return newReport;
   }
 
   // Test catalog methods
   getTestCatalog(): TestCatalogItem[] {
-    return this.data.testCatalog
+    return this.data.testCatalog;
   }
 
   setTestCatalog(catalog: TestCatalogItem[]) {
-    this.data.testCatalog = catalog
-    this.saveData()
+    this.data.testCatalog = catalog;
+    this.saveData();
   }
 
   // Utility methods
   generateId(prefix: string): string {
-    const now = new Date()
-    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "")
-    const sequence = String(Date.now()).slice(-4)
-    return `${prefix}-${dateStr}-${sequence}`
+    const now = new Date();
+    const dateStr = now.toISOString().split("T")[0].replace(/-/g, "");
+    const sequence = String(Date.now()).slice(-4);
+    return `${prefix}-${dateStr}-${sequence}`;
   }
 
   private initializeTestCatalog() {
@@ -220,6 +233,18 @@ export class DataManager {
         category: "Hematology",
       },
       {
+        code: "PMT",
+        name: "Pathologist Microscopy Test",
+        defaultPrice: 1200.0,
+        estimatedCost: 400.0,
+        unit: "per report",
+        referenceRange: {
+          PMT: "N/A",
+        },
+        category: "Pathology",
+      },
+
+      {
         code: "ESR",
         name: "Erythrocyte Sedimentation Rate",
         defaultPrice: 300.0,
@@ -244,28 +269,30 @@ export class DataManager {
       {
         code: "LIPID",
         name: "Lipid Profile",
-        defaultPrice: 1200.0,
-        estimatedCost: 400.0,
+        defaultPrice: 1500.0,
+        estimatedCost: 500.0,
         unit: "per test",
         referenceRange: {
-          "Total Cholesterol": "<200 mg/dL",
-          "HDL Cholesterol": ">40 mg/dL (M), >50 mg/dL (F)",
-          "LDL Cholesterol": "<100 mg/dL",
-          Triglycerides: "<150 mg/dL",
+          "Total Cholesterol": "150-200 mg/dL",
+          "HDL Cholesterol": "40-60 mg/dL",
+          Triglycerides: "50-150 mg/dL",
+          "VLDL Cholesterol": "5-40 mg/dL",
+          "LDL Cholesterol": "60-130 mg/dL", 
+          "Total Cholesterol/HDL Ratio": "<5.0",
         },
         category: "Biochemistry",
       },
       {
-  code: "FBS",
-  name: "Fasting Blood Sugar",
-  defaultPrice: 300.0,
-  estimatedCost: 100.0,
-  unit: "per test",
-  referenceRange: {
-    FBS: "70–100 mg/dL",
-  },
-  category: "Biochemistry",
-},
+        code: "FBS",
+        name: "Fasting Blood Sugar",
+        defaultPrice: 500.0,
+        estimatedCost: 150.0,
+        unit: "mg/dL",
+        referenceRange: {
+          FBS: "70-100 mg/dL",
+        },
+        category: "Biochemistry",
+      },
 
       {
         code: "GLUCOSE",
@@ -329,11 +356,11 @@ export class DataManager {
         },
         category: "Biochemistry",
       },
-    ]
+    ];
 
-    this.data.testCatalog = defaultCatalog
-    this.initializeSampleData()
-    this.saveData()
+    this.data.testCatalog = defaultCatalog;
+    this.initializeSampleData();
+    this.saveData();
   }
 
   private initializeSampleData() {
@@ -350,6 +377,7 @@ export class DataManager {
         doctorName: "Dr. Sarah Johnson",
         notes: "Regular checkup patient",
         createdAt: "2024-12-01T10:00:00.000Z",
+        name: "",
       },
       {
         id: "PAT-20241201-0002",
@@ -362,6 +390,7 @@ export class DataManager {
         doctorName: "Dr. Michael Brown",
         notes: "Diabetes monitoring",
         createdAt: "2024-12-01T11:30:00.000Z",
+        name: "",
       },
       {
         id: "PAT-20241201-0003",
@@ -374,8 +403,9 @@ export class DataManager {
         doctorName: "Dr. Sarah Johnson",
         notes: "Cardiac risk assessment",
         createdAt: "2024-12-01T14:15:00.000Z",
+        name: "",
       },
-    ]
+    ];
 
     // Add sample invoices
     const sampleInvoices: Invoice[] = [
@@ -404,6 +434,7 @@ export class DataManager {
         discountAmount: 0,
         grandTotal: 2000.0,
         createdAt: "2024-12-01T10:30:00.000Z",
+        status: "",
       },
       {
         id: "INV-20241201-0002",
@@ -430,8 +461,9 @@ export class DataManager {
         discountAmount: 130.0,
         grandTotal: 2470.0,
         createdAt: "2024-12-01T12:00:00.000Z",
+        status: "",
       },
-    ]
+    ];
 
     // Add sample reports
     const sampleReports: Report[] = [
@@ -458,14 +490,15 @@ export class DataManager {
             comments: "LDL slightly elevated",
           },
         ],
-        doctorRemarks: "Overall good health. Recommend dietary modifications for cholesterol management.",
+        doctorRemarks:
+          "Overall good health. Recommend dietary modifications for cholesterol management.",
         reviewedBy: "Dr. Sarah Johnson",
         createdAt: "2024-12-01T16:00:00.000Z",
       },
-    ]
+    ];
 
-    this.data.patients = samplePatients
-    this.data.invoices = sampleInvoices
-    this.data.reports = sampleReports
+    this.data.patients = samplePatients;
+    this.data.invoices = sampleInvoices;
+    this.data.reports = sampleReports;
   }
 }

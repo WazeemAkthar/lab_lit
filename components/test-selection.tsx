@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -57,6 +56,8 @@ export function TestSelectionComponent({ selectedTests, onTestsChange }: TestSel
     groups[category].push(test)
     return groups
   }, {} as Record<string, any[]>)
+
+
 
   return (
     <Card>

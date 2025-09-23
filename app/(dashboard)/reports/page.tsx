@@ -41,7 +41,7 @@ export default function ReportsPage() {
         report.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
         report.patientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         report.patientId.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        report.invoiceId.toLowerCase().includes(searchTerm.toLowerCase()),
+        (report.invoiceId ?? "").toLowerCase().includes(searchTerm.toLowerCase()),
     )
     setFilteredReports(filtered)
   }, [searchTerm, reports])
