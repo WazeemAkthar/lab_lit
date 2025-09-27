@@ -183,16 +183,16 @@ export class DataManager {
         category: "Hematology",
       },
       {
-        code: "CRP",
-        name: "C-Reactive Protein",
-        defaultPrice: 650.0,
-        estimatedCost: 200.0,
-        unit: "per test",
-        referenceRange: {
-          CRP: "<3.0 mg/L",
-        },
-        category: "Biochemistry",
-      },
+  code: "CRP",
+  name: "C-Reactive Protein",
+  defaultPrice: 650.0,
+  estimatedCost: 200.0,
+  unit: "mg/l",
+  referenceRange: {
+    "CRP": "< = 6 mg/l (Negative)"
+  },
+  category: "Biochemistry",
+},
       {
         code: "LIPID",
         name: "Lipid Profile",
@@ -272,6 +272,28 @@ export class DataManager {
         category: "Biochemistry",
       },
       // ADD YOUR NEW TESTS HERE
+      {
+  code: "RF",
+  name: "Rheumatoid Factor",
+  defaultPrice: 800.0,
+  estimatedCost: 250.0,
+  unit: "IU/ml",
+  referenceRange: {
+    "Rheumatoid Factor": "< 8 IU/ml (Negative)"
+  },
+  category: "Immunology",
+},
+{
+  code: "ASOT",
+  name: "Anti Streptolysin O Titre",
+  defaultPrice: 900.0,
+  estimatedCost: 300.0,
+  unit: "IU/l",
+  referenceRange: {
+    "ASOT": "< 200 IU/l (Negative)"
+  },
+  category: "Immunology",
+},
       {
         code: "VITAMIN_D",
         name: "Vitamin D (25-OH)",
