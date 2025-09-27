@@ -306,6 +306,267 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({ testCode,
             </div>
           )
         };
+       case 'esr':
+      case 'erythrocyte sedimentation rate':
+      case 'sed rate':
+        return {
+          title: "ESR Clinical Information",
+          content: (
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Raised ESR Section */}
+                <div>
+                  <h5 className="font-bold text-sm mb-3 underline">Raised ESR can be found in:</h5>
+                  <ol className="text-xs space-y-1 list-decimal list-inside">
+                    <li>Connective tissue disorders</li>
+                    <li>Infections e.g., TB, acute hepatitis, bacterial</li>
+                    <li>Hematological disease e.g., multiple myeloma, anemia of acute or chronic disease, along or combined with iron deficiency anemia</li>
+                    <li>Malignancy e.g., lymphoma, breast or colon cancer</li>
+                    <li>Pregnancy</li>
+                    <li>Increasing age and years</li>
+                    <li>Obesity can cause a moderately raised ESR</li>
+                  </ol>
+                </div>
+
+                {/* Low ESR Section */}
+                <div>
+                  <h5 className="font-bold text-sm mb-3 underline">Low ESR is found in:</h5>
+                  <ol className="text-xs space-y-1 list-decimal list-inside">
+                    <li>Heart failure</li>
+                    <li>Cachexia</li>
+                    <li>Hypofibrinogenemia</li>
+                    <li>Sickle cell disease</li>
+                    <li>Conditions featuring abnormal blood cells</li>
+                    <li>Polycythemia vera</li>
+                    <li>Leucocytosis</li>
+                    <li>Hypofibrinogenemia e.g. DIC</li>
+                    <li>Massive hepatic necrosis</li>
+                    <li>High white cell count</li>
+                    <li>Treatment with steroids</li>
+                  </ol>
+                </div>
+              </div>
+
+              {/* Important Note */}
+              <div className="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400">
+                <p className="text-xs font-medium">
+                  <strong>NB:</strong> Very high (&gt;100) ESR is found in autoimmune disease, malignancy, acute post trauma, and serious infection. A false high ESR can occur if the ambient temperature is unusually high.
+                </p>
+              </div>
+            </div>
+          )
+        };
+case 'fbs':
+case 'fasting blood sugar':
+case 'glucose':
+case 'fasting glucose':
+  return {
+    title: "Fasting Blood Glucose Guidelines",
+    content: (
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm mb-3 leading-relaxed">
+            Elevated glucose levels (hyperglycemia) are most often encountered clinically in the setting of diabetes 
+            mellitus, but they may also occur with pancreatic neoplasms, hyperthyroidism, and adrenocortical dysfunction. 
+            Decreased glucose levels (hypoglycemia) may result from endogenous or exogenous insulin excess, prolonged starvation, or liver disease.
+          </p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 p-2 text-left font-semibold">Fasting Glucose (mg/dL)</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">2-Hour PP Glucose (mg/dL)</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">Diagnosis</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2">&lt;100</td>
+                <td className="border border-gray-300 p-2">&lt;140</td>
+                <td className="border border-gray-300 p-2 font-medium">Normal</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">100 to 125</td>
+                <td className="border border-gray-300 p-2">140 to 199</td>
+                <td className="border border-gray-300 p-2 font-medium">Pre Diabetes</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">&gt;126</td>
+                <td className="border border-gray-300 p-2">&gt;200</td>
+                <td className="border border-gray-300 p-2 font-medium">Diabetes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-400">
+          <p className="text-xs">
+            <strong>Note:</strong> A level of 126 mg/dL or above, confirmed by repeating the test on another day, means a person has diabetes.
+            GTT: An Oral Glucose Tolerance Test may be necessary to aid in the diagnosis of developing type 2 diabetes but is not needed yet.
+            A 2-hour glucose level of 200 mg/dL or above, confirmed by repeating the test on another day, means a person has diabetes.
+          </p>
+        </div>
+      </div>
+    )
+  };
+
+case 'vitamin_d':
+case 'vitamin d':
+case '25-oh vitamin d':
+  return {
+    title: "Vitamin D Status Guidelines",
+    content: (
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm mb-3 leading-relaxed">
+            Vitamin D is essential for bone health, immune function, and calcium absorption. Deficiency is common 
+            worldwide and associated with bone disorders, muscle weakness, and increased infection risk.
+          </p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 p-2 text-left font-semibold">Level (ng/mL)</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">Status</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">Clinical Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2">&lt;10</td>
+                <td className="border border-gray-300 p-2 font-medium text-red-600">Severe Deficiency</td>
+                <td className="border border-gray-300 p-2">High-dose supplementation required</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">10-20</td>
+                <td className="border border-gray-300 p-2 font-medium text-orange-600">Deficiency</td>
+                <td className="border border-gray-300 p-2">Supplementation recommended</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">20-30</td>
+                <td className="border border-gray-300 p-2 font-medium text-yellow-600">Insufficiency</td>
+                <td className="border border-gray-300 p-2">Consider supplementation</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">30-100</td>
+                <td className="border border-gray-300 p-2 font-medium text-green-600">Sufficient</td>
+                <td className="border border-gray-300 p-2">Maintain current intake</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">&gt;100</td>
+                <td className="border border-gray-300 p-2 font-medium text-red-600">Toxicity Risk</td>
+                <td className="border border-gray-300 p-2">Reduce supplementation</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  };
+
+case 'b12':
+case 'vitamin b12':
+case 'cobalamin':
+  return {
+    title: "Vitamin B12 Clinical Guidelines",
+    content: (
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm mb-3 leading-relaxed">
+            Vitamin B12 is essential for DNA synthesis, neurological function, and red blood cell formation. 
+            Deficiency can cause anemia, neuropathy, and cognitive impairment.
+          </p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 p-2 text-left font-semibold">Level (pg/mL)</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2">&lt;200</td>
+                <td className="border border-gray-300 p-2 font-medium text-red-600">Deficiency</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">200-300</td>
+                <td className="border border-gray-300 p-2 font-medium text-yellow-600">Borderline Low</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">300-900</td>
+                <td className="border border-gray-300 p-2 font-medium text-green-600">Normal</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">&gt;900</td>
+                <td className="border border-gray-300 p-2 font-medium">High</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        
+        <div className="mt-4 p-3 bg-yellow-50 border-l-4 border-yellow-400">
+          <p className="text-xs">
+            <strong>Common causes of deficiency:</strong> Pernicious anemia, dietary insufficiency (vegetarians), 
+            malabsorption, gastric surgery, certain medications.
+          </p>
+        </div>
+      </div>
+    )
+  };
+
+case 'crp':
+case 'c-reactive protein':
+case 'c reactive protein':
+  return {
+    title: "C-Reactive Protein Interpretation",
+    content: (
+      <div className="space-y-4">
+        <div>
+          <p className="text-sm mb-3 leading-relaxed">
+            CRP is an acute-phase protein that rises rapidly during inflammation, infection, or tissue injury. 
+            It's used to detect and monitor inflammatory processes and cardiovascular risk.
+          </p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full border-collapse border border-gray-300 text-sm">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="border border-gray-300 p-2 text-left font-semibold">CRP Level (mg/L)</th>
+                <th className="border border-gray-300 p-2 text-left font-semibold">Interpretation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td className="border border-gray-300 p-2">&lt;1.0</td>
+                <td className="border border-gray-300 p-2">Low cardiovascular risk</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">1.0-3.0</td>
+                <td className="border border-gray-300 p-2">Average cardiovascular risk</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">&gt;3.0</td>
+                <td className="border border-gray-300 p-2">High cardiovascular risk</td>
+              </tr>
+              <tr>
+                <td className="border border-gray-300 p-2">&gt;10.0</td>
+                <td className="border border-gray-300 p-2 font-medium">Significant inflammation/infection</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  };
+
 
       default:
         return null;

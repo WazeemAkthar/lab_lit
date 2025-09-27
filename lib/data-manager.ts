@@ -94,35 +94,207 @@ export class DataManager {
     try {
       const stored = localStorage.getItem("lablite_data");
       if (stored) {
-        this.data = JSON.parse(stored);
+        const parsedData = JSON.parse(stored);
+        this.data = parsedData;
 
-        // 🔑 Ensure testCatalog always includes new default tests
-        const defaultCatalog: TestCatalogItem[] = this.getTestCatalog();
-        const existingCodes = new Set(this.data.testCatalog.map((t) => t.code));
-
-        defaultCatalog.forEach((test) => {
-          if (!existingCodes.has(test.code)) {
-            this.data.testCatalog.push(test);
-          }
-        });
-
-        this.saveData();
+        // Always ensure we have the latest default tests
+        this.ensureDefaultTests();
       } else {
         // Initialize with fresh defaults
-        this.initializeTestCatalog();
+        this.initializeWithDefaults();
       }
     } catch (error) {
       console.error("Error loading data from localStorage:", error);
-      this.initializeTestCatalog();
+      this.initializeWithDefaults();
     }
   }
 
   private saveData() {
     try {
       localStorage.setItem("lablite_data", JSON.stringify(this.data));
+      console.log("Data saved to localStorage:", this.data);
     } catch (error) {
       console.error("Error saving data to localStorage:", error);
     }
+  }
+
+  // Method to ensure default tests are always present
+  private ensureDefaultTests() {
+    const defaultTests = this.getDefaultTestCatalog();
+    const existingCodes = new Set(this.data.testCatalog.map((t) => t.code));
+
+    let hasNewTests = false;
+    defaultTests.forEach((test) => {
+      if (!existingCodes.has(test.code)) {
+        this.data.testCatalog.push(test);
+        hasNewTests = true;
+        console.log(`Added new test: ${test.code} - ${test.name}`);
+      }
+    });
+
+    if (hasNewTests) {
+      this.saveData();
+    }
+  }
+
+  // Method to get the default test catalog (separated for better management)
+  private getDefaultTestCatalog(): TestCatalogItem[] {
+    return [
+      {
+        code: "FBC",
+        name: "Full Blood Count",
+        defaultPrice: 800.0,
+        estimatedCost: 250.0,
+        unit: "per test",
+        referenceRange: {
+          WBC: "4.0-11.0 x10³/μL",
+          RBC: "4.5-5.5 x10⁶/μL",
+          Hemoglobin: "12.0-16.0 g/dL",
+          Hematocrit: "36-46%",
+          Platelets: "150-450 x10³/μL",
+          Neutrophils: "40-60%",
+          Lymphocytes: "20-40%",
+          Monocytes: "2-8%",
+          Eosinophils: "1-4%",
+          Basophils: "0.5-1%",
+        },
+        category: "Hematology",
+      },
+      {
+        code: "PMT",
+        name: "Pathologist Microscopy Test",
+        defaultPrice: 1200.0,
+        estimatedCost: 400.0,
+        unit: "per report",
+        referenceRange: {
+          PMT: "N/A",
+        },
+        category: "Pathology",
+      },
+      {
+        code: "ESR",
+        name: "Erythrocyte Sedimentation Rate",
+        defaultPrice: 300.0,
+        estimatedCost: 100.0,
+        unit: "per test",
+        referenceRange: {
+          ESR: "0-15 mm/hr (M), 0-20 mm/hr (F)",
+        },
+        category: "Hematology",
+      },
+      {
+        code: "CRP",
+        name: "C-Reactive Protein",
+        defaultPrice: 650.0,
+        estimatedCost: 200.0,
+        unit: "per test",
+        referenceRange: {
+          CRP: "<3.0 mg/L",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "LIPID",
+        name: "Lipid Profile",
+        defaultPrice: 1500.0,
+        estimatedCost: 500.0,
+        unit: "per test",
+        referenceRange: {
+          "Total Cholesterol": "150-200 mg/dL",
+          "HDL Cholesterol": "40-60 mg/dL",
+          Triglycerides: "50-150 mg/dL",
+          "VLDL Cholesterol": "5-40 mg/dL",
+          "LDL Cholesterol": "60-130 mg/dL", 
+          "Total Cholesterol/HDL Ratio": "<5.0",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "FBS",
+        name: "Fasting Blood Sugar",
+        defaultPrice: 200.0,
+        estimatedCost: 60.0,
+        unit: "mg/dL",
+        referenceRange: {
+          Glucose: "70-100 mg/dL",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "URINE",
+        name: "Urinalysis",
+        defaultPrice: 300.0,
+        estimatedCost: 100.0,
+        unit: "per test",
+        referenceRange: {
+          Protein: "Negative",
+          Glucose: "Negative",
+          Blood: "Negative",
+          Leukocytes: "Negative",
+          "Specific Gravity": "1.003-1.030",
+        },
+        category: "Urinalysis",
+      },
+      {
+        code: "TSH",
+        name: "Thyroid Stimulating Hormone",
+        defaultPrice: 1500.0,
+        estimatedCost: 500.0,
+        unit: "per test",
+        referenceRange: {
+          TSH: "0.4-4.0 mIU/L",
+        },
+        category: "Endocrinology",
+      },
+      {
+        code: "HBA1C",
+        name: "Hemoglobin A1c",
+        defaultPrice: 2400.0,
+        estimatedCost: 800.0,
+        unit: "per test",
+        referenceRange: {
+          HbA1c: "<5.7% (Normal), 5.7-6.4% (Prediabetes), ≥6.5% (Diabetes)",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "LIVER",
+        name: "Liver Function Tests",
+        defaultPrice: 1800.0,
+        estimatedCost: 600.0,
+        unit: "per test",
+        referenceRange: {
+          ALT: "7-56 U/L",
+          AST: "10-40 U/L",
+          "Bilirubin Total": "0.3-1.2 mg/dL",
+          Albumin: "3.5-5.0 g/dL",
+        },
+        category: "Biochemistry",
+      },
+      // ADD YOUR NEW TESTS HERE
+      {
+        code: "VITAMIN_D",
+        name: "Vitamin D (25-OH)",
+        defaultPrice: 2000.0,
+        estimatedCost: 600.0,
+        unit: "ng/mL",
+        referenceRange: {
+          "Vitamin D": "30-100 ng/mL",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "B12",
+        name: "Vitamin B12",
+        defaultPrice: 1800.0,
+        estimatedCost: 500.0,
+        unit: "pg/mL",
+        referenceRange: {
+          "Vitamin B12": "200-900 pg/mL",
+        },
+        category: "Biochemistry",
+      }
+    ];
   }
 
   // Patient methods
@@ -194,12 +366,52 @@ export class DataManager {
 
   // Test catalog methods
   getTestCatalog(): TestCatalogItem[] {
+    console.log("Getting test catalog:", this.data.testCatalog);
     return this.data.testCatalog;
+  }
+
+  // Method to add a single test to the catalog
+  addTestToCatalog(test: TestCatalogItem): void {
+    const existingIndex = this.data.testCatalog.findIndex(t => t.code === test.code);
+    if (existingIndex !== -1) {
+      // Update existing test
+      this.data.testCatalog[existingIndex] = test;
+      console.log(`Updated existing test: ${test.code}`);
+    } else {
+      // Add new test
+      this.data.testCatalog.push(test);
+      console.log(`Added new test: ${test.code} - ${test.name}`);
+    }
+    this.saveData();
+  }
+
+  // Method to remove a test from catalog
+  removeTestFromCatalog(testCode: string): boolean {
+    const initialLength = this.data.testCatalog.length;
+    this.data.testCatalog = this.data.testCatalog.filter(test => test.code !== testCode);
+    
+    if (this.data.testCatalog.length < initialLength) {
+      console.log(`Removed test: ${testCode}`);
+      this.saveData();
+      return true;
+    }
+    return false;
   }
 
   setTestCatalog(catalog: TestCatalogItem[]) {
     this.data.testCatalog = catalog;
     this.saveData();
+  }
+
+  // Method to force refresh test catalog (useful for development)
+  refreshTestCatalog(): void {
+    console.log("Refreshing test catalog...");
+    this.ensureDefaultTests();
+  }
+
+  // Method to get test by code
+  getTestByCode(code: string): TestCatalogItem | undefined {
+    return this.data.testCatalog.find(test => test.code === code);
   }
 
   // Utility methods
@@ -210,157 +422,24 @@ export class DataManager {
     return `${prefix}-${dateStr}-${sequence}`;
   }
 
-  private initializeTestCatalog() {
-    const defaultCatalog: TestCatalogItem[] = [
-      {
-        code: "FBC",
-        name: "Full Blood Count",
-        defaultPrice: 800.0,
-        estimatedCost: 250.0,
-        unit: "per test",
-        referenceRange: {
-          WBC: "4.0-11.0 x10³/μL",
-          RBC: "4.5-5.5 x10⁶/μL",
-          Hemoglobin: "12.0-16.0 g/dL",
-          Hematocrit: "36-46%",
-          Platelets: "150-450 x10³/μL",
-          Neutrophils: "40-60%",
-          Lymphocytes: "20-40%",
-          Monocytes: "2-8%",
-          Eosinophils: "1-4%",
-          Basophils: "0.5-1%",
-        },
-        category: "Hematology",
-      },
-      {
-        code: "PMT",
-        name: "Pathologist Microscopy Test",
-        defaultPrice: 1200.0,
-        estimatedCost: 400.0,
-        unit: "per report",
-        referenceRange: {
-          PMT: "N/A",
-        },
-        category: "Pathology",
-      },
+  // Method to clear all data (useful for development/testing)
+  clearAllData(): void {
+    this.data = {
+      patients: [],
+      invoices: [],
+      reports: [],
+      testCatalog: [],
+    };
+    localStorage.removeItem("lablite_data");
+    this.initializeWithDefaults();
+  }
 
-      {
-        code: "ESR",
-        name: "Erythrocyte Sedimentation Rate",
-        defaultPrice: 300.0,
-        estimatedCost: 100.0,
-        unit: "per test",
-        referenceRange: {
-          ESR: "0-15 mm/hr (M), 0-20 mm/hr (F)",
-        },
-        category: "Hematology",
-      },
-      {
-        code: "CRP",
-        name: "C-Reactive Protein",
-        defaultPrice: 650.0,
-        estimatedCost: 200.0,
-        unit: "per test",
-        referenceRange: {
-          CRP: "<3.0 mg/L",
-        },
-        category: "Biochemistry",
-      },
-      {
-        code: "LIPID",
-        name: "Lipid Profile",
-        defaultPrice: 1500.0,
-        estimatedCost: 500.0,
-        unit: "per test",
-        referenceRange: {
-          "Total Cholesterol": "150-200 mg/dL",
-          "HDL Cholesterol": "40-60 mg/dL",
-          Triglycerides: "50-150 mg/dL",
-          "VLDL Cholesterol": "5-40 mg/dL",
-          "LDL Cholesterol": "60-130 mg/dL", 
-          "Total Cholesterol/HDL Ratio": "<5.0",
-        },
-        category: "Biochemistry",
-      },
-      {
-        code: "FBS",
-        name: "Fasting Blood Sugar",
-        defaultPrice: 500.0,
-        estimatedCost: 150.0,
-        unit: "mg/dL",
-        referenceRange: {
-          FBS: "70-100 mg/dL",
-        },
-        category: "Biochemistry",
-      },
-
-      {
-        code: "GLUCOSE",
-        name: "Fasting Glucose",
-        defaultPrice: 200.0,
-        estimatedCost: 60.0,
-        unit: "per test",
-        referenceRange: {
-          Glucose: "70-100 mg/dL",
-        },
-        category: "Biochemistry",
-      },
-      {
-        code: "URINE",
-        name: "Urinalysis",
-        defaultPrice: 300.0,
-        estimatedCost: 100.0,
-        unit: "per test",
-        referenceRange: {
-          Protein: "Negative",
-          Glucose: "Negative",
-          Blood: "Negative",
-          Leukocytes: "Negative",
-          "Specific Gravity": "1.003-1.030",
-        },
-        category: "Urinalysis",
-      },
-      {
-        code: "TSH",
-        name: "Thyroid Stimulating Hormone",
-        defaultPrice: 1500.0,
-        estimatedCost: 500.0,
-        unit: "per test",
-        referenceRange: {
-          TSH: "0.4-4.0 mIU/L",
-        },
-        category: "Endocrinology",
-      },
-      {
-        code: "HBA1C",
-        name: "Hemoglobin A1c",
-        defaultPrice: 2400.0,
-        estimatedCost: 800.0,
-        unit: "per test",
-        referenceRange: {
-          HbA1c: "<5.7% (Normal), 5.7-6.4% (Prediabetes), ≥6.5% (Diabetes)",
-        },
-        category: "Biochemistry",
-      },
-      {
-        code: "LIVER",
-        name: "Liver Function Tests",
-        defaultPrice: 1800.0,
-        estimatedCost: 600.0,
-        unit: "per test",
-        referenceRange: {
-          ALT: "7-56 U/L",
-          AST: "10-40 U/L",
-          "Bilirubin Total": "0.3-1.2 mg/dL",
-          Albumin: "3.5-5.0 g/dL",
-        },
-        category: "Biochemistry",
-      },
-    ];
-
-    this.data.testCatalog = defaultCatalog;
+  // Method to initialize with defaults
+  private initializeWithDefaults() {
+    this.data.testCatalog = this.getDefaultTestCatalog();
     this.initializeSampleData();
     this.saveData();
+    console.log("Initialized with default data:", this.data);
   }
 
   private initializeSampleData() {
@@ -442,8 +521,8 @@ export class DataManager {
         patientName: "Emily Davis",
         lineItems: [
           {
-            testCode: "GLUCOSE",
-            testName: "Fasting Glucose",
+            testCode: "FBS",
+            testName: "Fasting Blood Sugar",
             quantity: 1,
             unitPrice: 200.0,
             total: 200.0,
