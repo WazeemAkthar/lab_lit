@@ -11,7 +11,7 @@ import { DataManager, type Report } from "@/lib/data-manager";
 import { generateReportPDF } from "@/lib/pdf-generator";
 import Link from "next/link";
 import ReportQRCode from "@/components/ReportQRCode";
-import TestAdditionalDetails from "@/components/TestAdditionalDetails"; 
+import TestAdditionalDetails from "@/components/TestAdditionalDetails";
 
 export default function ReportDetailsPage() {
   const params = useParams();
@@ -188,7 +188,9 @@ export default function ReportDetailsPage() {
               <div key={testCode}>
                 {renderRegularTestResults(testCode, resultsArray)}
                 {/* Add the TestAdditionalDetails component for non-FBC tests */}
-                <TestAdditionalDetails testCode={testCode} />
+                <div className="mt-4">
+                  <TestAdditionalDetails testCode={testCode} />
+                </div>
               </div>
             );
           }
@@ -321,11 +323,15 @@ export default function ReportDetailsPage() {
 
   const renderRegularTestResults = (testCode: string, testResults: any[]) => {
     console.log("Rendering regular test results for:", testResults);
+
+    const dataManager = DataManager.getInstance();
+  const testConfig = dataManager.getTestByCode(testCode);
+  const testName = testConfig ? testConfig.name : testCode
     return (
       <div key={testCode}>
-        <h4 className="font-semibold text-xl text-left text-muted-foreground mb-3 underline">
-          {testCode}
-        </h4>
+        <h1 className="font-semibold text-xl text-center text-muted-foreground mb-3 border-black border-b-2">
+          {testName} ({testCode})
+        </h1>
         <table className="w-full border-collapse">
           <thead>
             <tr className="border-b">
@@ -838,15 +844,14 @@ export default function ReportDetailsPage() {
             )}
 
             {/* Footer */}
-            <div className="mt-8 pt-6 border-t-2 border-gray-300 flex justify-between items-center">
-              <div className="text-center text-sm text-muted-foreground space-y-2 flex-1">
-                <p className="font-normal text-lg text-black">
-                  -- End of Report --
-                </p>
-              </div>
 
-              {/* QR Code for download */}
-              {/* <div className="flex-shrink-0">
+            {/* <div className="text-center text-sm text-muted-foreground space-y-2 flex-1"> */}
+            <p className="font-normal text-center text-lg text-black">
+              -- End of Report --
+            </p>
+
+            {/* QR Code for download */}
+            {/* <div className="flex-shrink-0">
                 <ReportQRCode
                   reportId={report.id}
                   patientName={report.patientName}
@@ -855,7 +860,7 @@ export default function ReportDetailsPage() {
                   className="print:block"
                 />
               </div> */}
-            </div>
+            {/* </div> */}
           </CardContent>
         </Card>
       </div>

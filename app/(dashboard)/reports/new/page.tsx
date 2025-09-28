@@ -816,7 +816,7 @@ export default function NewReportPage() {
                                 e.target.value
                               )
                             }
-                            placeholder="e.g., mg/dL, %"
+                            placeholder={`e.g., ${result.unit}`}
                           />
                         </div>
 
@@ -836,7 +836,7 @@ export default function NewReportPage() {
                                 e.target.value
                               )
                             }
-                            placeholder="e.g., 70-100 mg/dL"
+                            placeholder={`e.g., ${result.referenceRange}`}
                           />
                         </div>
                       </div>

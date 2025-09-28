@@ -541,7 +541,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
           title: "Fasting Blood Glucose Guidelines",
           content: (
             <div className="space-y-4">
-              <div>
+              {/* <div>
                 <p className="text-sm mb-3 leading-relaxed">
                   Elevated glucose levels (hyperglycemia) are most often
                   encountered clinically in the setting of diabetes mellitus,
@@ -551,59 +551,35 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                   exogenous insulin excess, prolonged starvation, or liver
                   disease.
                 </p>
-              </div>
+              </div> */}
 
               <div className="overflow-x-auto">
                 <table className="w-full border-collapse border border-gray-300 text-sm">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="border border-gray-300 p-2 text-left font-semibold">
-                        Fasting Glucose (mg/dL)
-                      </th>
-                      <th className="border border-gray-300 p-2 text-left font-semibold">
-                        2-Hour PP Glucose (mg/dL)
-                      </th>
-                      <th className="border border-gray-300 p-2 text-left font-semibold">
-                        Diagnosis
-                      </th>
-                    </tr>
-                  </thead>
+                  
                   <tbody>
                     <tr>
-                      <td className="border border-gray-300 p-2">&lt;100</td>
-                      <td className="border border-gray-300 p-2">&lt;140</td>
+                      <td className="border border-gray-300 p-2">60 - 110</td>
+                      
                       <td className="border border-gray-300 p-2 font-medium">
                         Normal
                       </td>
                     </tr>
                     <tr>
-                      <td className="border border-gray-300 p-2">100 to 125</td>
-                      <td className="border border-gray-300 p-2">140 to 199</td>
+                      <td className="border border-gray-300 p-2">110 - 125</td>
+                      
                       <td className="border border-gray-300 p-2 font-medium">
-                        Pre Diabetes
+                        Impaired
                       </td>
                     </tr>
                     <tr>
-                      <td className="border border-gray-300 p-2">&gt;126</td>
-                      <td className="border border-gray-300 p-2">&gt;200</td>
+                      <td className="border border-gray-300 p-2">=&gt;125</td>
+                      
                       <td className="border border-gray-300 p-2 font-medium">
-                        Diabetes
+                        High
                       </td>
                     </tr>
                   </tbody>
                 </table>
-              </div>
-
-              <div className="mt-4 p-3 bg-blue-50 border-l-4 border-blue-400">
-                <p className="text-xs">
-                  <strong>Note:</strong> A level of 126 mg/dL or above,
-                  confirmed by repeating the test on another day, means a person
-                  has diabetes. GTT: An Oral Glucose Tolerance Test may be
-                  necessary to aid in the diagnosis of developing type 2
-                  diabetes but is not needed yet. A 2-hour glucose level of 200
-                  mg/dL or above, confirmed by repeating the test on another
-                  day, means a person has diabetes.
-                </p>
               </div>
             </div>
           ),

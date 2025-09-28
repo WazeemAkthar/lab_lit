@@ -216,7 +216,7 @@ export class DataManager {
         estimatedCost: 60.0,
         unit: "mg/dL",
         referenceRange: {
-          Glucose: "70-100 mg/dL",
+          Glucose: "60-110",
         },
         category: "Biochemistry",
       },
