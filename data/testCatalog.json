@@ -33,9 +33,10 @@
     "name": "Erythrocyte Sedimentation Rate",
     "defaultPrice": 300.0,
     "estimatedCost": 100.0,
-    "unit": "per test",
+    "unit": "mm",
     "referenceRange": {
-      "ESR": "0-15 mm/hr (M), 0-20 mm/hr (F)"
+      "1st hour": "0-10",
+      "2nd hour": "0-20"
     },
     "category": "Hematology"
   },
@@ -50,35 +51,33 @@
     },
     "category": "Biochemistry"
   },
-{
-  "code": "PMT",
-  "name": "Pathologist Morphology Test",
-  "defaultPrice": 5000,
-  "estimatedCost": 2000,
-  "unit": "per test",
-  "referenceRange": {
-    "Observation": "Report provided by pathologist"
+  {
+    "code": "PMT",
+    "name": "Pathologist Morphology Test",
+    "defaultPrice": 5000,
+    "estimatedCost": 2000,
+    "unit": "per test",
+    "referenceRange": {
+      "Observation": "Report provided by pathologist"
+    },
+    "category": "Special Tests"
   },
-  "category": "Special Tests"
-}
-,
-
- {
-        "code": "LIPID",
-        "name": "Lipid Profile",
-        "defaultPrice": 1500.0,
-        "estimatedCost": 500.0,
-        "unit": "per test",
-        "referenceRange": {
-          "Total Cholesterol": "150-200 mg/dL",
-          "HDL Cholesterol": "40-60 mg/dL",
-          "Triglycerides": "50-150 mg/dL",
-          "VLDL Cholesterol": "5-40 mg/dL",
-          "LDL Cholesterol": "60-130 mg/dL", 
-          "Total Cholesterol/HDL Ratio": "<5.0"
-        },
-        "category": "Biochemistry"
-      },
+  {
+    "code": "LIPID",
+    "name": "Lipid Profile",
+    "defaultPrice": 1500.0,
+    "estimatedCost": 500.0,
+    "unit": "per test",
+    "referenceRange": {
+      "Total Cholesterol": "150-200 mg/dL",
+      "HDL Cholesterol": "40-60 mg/dL",
+      "Triglycerides": "50-150 mg/dL",
+      "VLDL Cholesterol": "5-40 mg/dL",
+      "LDL Cholesterol": "60-130 mg/dL",
+      "Total Cholesterol/HDL Ratio": "<5.0"
+    },
+    "category": "Biochemistry"
+  },
   {
     "code": "GLUCOSE",
     "name": "Fasting Glucose",
@@ -106,16 +105,16 @@
     "category": "Urinalysis"
   },
   {
-  "code": "FBS",
-  "name": "Fasting Blood Sugar",
-  "defaultPrice": 300.0,
-  "estimatedCost": 100.0,
-  "unit": "per test",
-  "referenceRange": {
-    "FBS": "70–100 mg/dL"
+    "code": "FBS",
+    "name": "Fasting Blood Sugar",
+    "defaultPrice": 300.0,
+    "estimatedCost": 100.0,
+    "unit": "per test",
+    "referenceRange": {
+      "FBS": "70–100 mg/dL"
+    },
+    "category": "Biochemistry"
   },
-  "category": "Biochemistry"
-},
 
   {
     "code": "TSH",

@@ -176,23 +176,24 @@ export class DataManager {
         name: "Erythrocyte Sedimentation Rate",
         defaultPrice: 300.0,
         estimatedCost: 100.0,
-        unit: "per test",
+        unit: "mm/hr",
         referenceRange: {
-          ESR: "0-15 mm/hr (M), 0-20 mm/hr (F)",
+          "1st hour": "0-10",
+          "2nd hour": "0-20",
         },
         category: "Hematology",
       },
       {
-  code: "CRP",
-  name: "C-Reactive Protein",
-  defaultPrice: 650.0,
-  estimatedCost: 200.0,
-  unit: "mg/l",
-  referenceRange: {
-    "CRP": "< = 6 mg/l (Negative)"
-  },
-  category: "Biochemistry",
-},
+        code: "CRP",
+        name: "C-Reactive Protein",
+        defaultPrice: 650.0,
+        estimatedCost: 200.0,
+        unit: "mg/l",
+        referenceRange: {
+          CRP: "< = 6 mg/l (Negative)",
+        },
+        category: "Biochemistry",
+      },
       {
         code: "LIPID",
         name: "Lipid Profile",
@@ -204,7 +205,7 @@ export class DataManager {
           "HDL Cholesterol": "40-60 mg/dL",
           Triglycerides: "50-150 mg/dL",
           "VLDL Cholesterol": "5-40 mg/dL",
-          "LDL Cholesterol": "60-130 mg/dL", 
+          "LDL Cholesterol": "60-130 mg/dL",
           "Total Cholesterol/HDL Ratio": "<5.0",
         },
         category: "Biochemistry",
@@ -273,27 +274,27 @@ export class DataManager {
       },
       // ADD YOUR NEW TESTS HERE
       {
-  code: "RF",
-  name: "Rheumatoid Factor",
-  defaultPrice: 800.0,
-  estimatedCost: 250.0,
-  unit: "IU/ml",
-  referenceRange: {
-    "Rheumatoid Factor": "< 8 IU/ml (Negative)"
-  },
-  category: "Immunology",
-},
-{
-  code: "ASOT",
-  name: "Anti Streptolysin O Titre",
-  defaultPrice: 900.0,
-  estimatedCost: 300.0,
-  unit: "IU/l",
-  referenceRange: {
-    "ASOT": "< 200 IU/l (Negative)"
-  },
-  category: "Immunology",
-},
+        code: "RF",
+        name: "Rheumatoid Factor",
+        defaultPrice: 800.0,
+        estimatedCost: 250.0,
+        unit: "IU/ml",
+        referenceRange: {
+          "Rheumatoid Factor": "< 8 IU/ml (Negative)",
+        },
+        category: "Immunology",
+      },
+      {
+        code: "ASOT",
+        name: "Anti Streptolysin O Titre",
+        defaultPrice: 900.0,
+        estimatedCost: 300.0,
+        unit: "IU/l",
+        referenceRange: {
+          ASOT: "< 200 IU/l (Negative)",
+        },
+        category: "Immunology",
+      },
       {
         code: "VITAMIN_D",
         name: "Vitamin D (25-OH)",
@@ -315,7 +316,7 @@ export class DataManager {
           "Vitamin B12": "200-900 pg/mL",
         },
         category: "Biochemistry",
-      }
+      },
     ];
   }
 
@@ -394,7 +395,9 @@ export class DataManager {
 
   // Method to add a single test to the catalog
   addTestToCatalog(test: TestCatalogItem): void {
-    const existingIndex = this.data.testCatalog.findIndex(t => t.code === test.code);
+    const existingIndex = this.data.testCatalog.findIndex(
+      (t) => t.code === test.code
+    );
     if (existingIndex !== -1) {
       // Update existing test
       this.data.testCatalog[existingIndex] = test;
@@ -410,8 +413,10 @@ export class DataManager {
   // Method to remove a test from catalog
   removeTestFromCatalog(testCode: string): boolean {
     const initialLength = this.data.testCatalog.length;
-    this.data.testCatalog = this.data.testCatalog.filter(test => test.code !== testCode);
-    
+    this.data.testCatalog = this.data.testCatalog.filter(
+      (test) => test.code !== testCode
+    );
+
     if (this.data.testCatalog.length < initialLength) {
       console.log(`Removed test: ${testCode}`);
       this.saveData();
@@ -433,7 +438,7 @@ export class DataManager {
 
   // Method to get test by code
   getTestByCode(code: string): TestCatalogItem | undefined {
-    return this.data.testCatalog.find(test => test.code === code);
+    return this.data.testCatalog.find((test) => test.code === code);
   }
 
   // Utility methods
