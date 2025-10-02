@@ -534,6 +534,31 @@ const handleTestSelection = (testCodes: string[]) => {
             referenceRange: "<5.0",
             comments: "",
           },
+          
+    {
+      testCode: "LIPID",
+      testName: "Total Cholesterol/HDL Ratio",
+      value: lipidValues.tcHdlRatio,
+      unit: "",
+      referenceRange: "3.5-5.0",
+      comments: "",
+    },
+    {
+      testCode: "LIPID",
+      testName: "TG/HDL Ratio",
+      value: lipidValues.tgHdlRatio,
+      unit: "",
+      referenceRange: "<4.0",
+      comments: "",
+    },
+    {
+      testCode: "LIPID",
+      testName: "Non-HDL Cholesterol",
+      value: lipidValues.nonHdl,
+      unit: "mg/dL",
+      referenceRange: "<130",
+      comments: "",
+    },
         ].filter((r) => r.value && r.value.trim() !== "");
 
         allResults.push(...lipidResults);
@@ -793,100 +818,95 @@ const handleTestSelection = (testCodes: string[]) => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  {results.map((result, index) => (
-                    <div
-                      key={`${result.testCode}-${result.testName}-${index}`}
-                      className="p-4 border rounded-lg space-y-4"
-                    >
-                      <div className="flex items-center gap-2 mb-3">
-                        <Badge variant="outline">{result.testCode}</Badge>
-                        <span className="font-medium">{result.testName}</span>
-                      </div>
+                 {results.map((result, index) => {
+  const dataManager = DataManager.getInstance();
+  const isQualitative = dataManager.getTestByCode(result.testCode)?.isQualitative || false;
+  
+  return (
+    <div key={`${result.testCode}-${result.testName}-${index}`} className="p-4 border rounded-lg space-y-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Badge variant="outline">{result.testCode}</Badge>
+        <span className="font-medium">{result.testName}</span>
+        {isQualitative && (
+          <Badge variant="secondary" className="ml-2">Qualitative</Badge>
+        )}
+      </div>
 
-                      <div className="grid gap-4 md:grid-cols-3">
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor={`value-${result.testCode}-${result.testName}-${index}`}
-                          >
-                            Result Value *
-                          </Label>
-                          <Input
-                            id={`value-${result.testCode}-${result.testName}-${index}`}
-                            value={result.value}
-                            onChange={(e) =>
-                              updateResult(
-                                result.testName,
-                                "value",
-                                e.target.value
-                              )
-                            }
-                            placeholder="Enter result value"
-                          />
-                        </div>
+      <div className="grid gap-4 md:grid-cols-3">
+        <div className="space-y-2">
+          <Label htmlFor={`value-${result.testCode}-${result.testName}-${index}`}>
+            Result Value *
+          </Label>
+          <Input
+            id={`value-${result.testCode}-${result.testName}-${index}`}
+            value={result.value}
+            onChange={(e) => updateResult(result.testName, "value", e.target.value)}
+            placeholder="Enter result value"
+          />
+        </div>
 
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor={`unit-${result.testCode}-${result.testName}-${index}`}
-                          >
-                            Unit
-                          </Label>
-                          <Input
-                            id={`unit-${result.testCode}-${result.testName}-${index}`}
-                            value={result.unit}
-                            onChange={(e) =>
-                              updateResult(
-                                result.testName,
-                                "unit",
-                                e.target.value
-                              )
-                            }
-                            placeholder={`e.g., ${result.unit}`}
-                          />
-                        </div>
+        {isQualitative && (
+          <div className="space-y-2">
+            <Label htmlFor={`qualitative-${result.testCode}-${result.testName}-${index}`}>
+              Qualitative Result *
+            </Label>
+            <Select
+              value={result.comments || ""}
+              onValueChange={(value) => updateResult(result.testName, "comments", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select result" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Positive">Positive</SelectItem>
+                <SelectItem value="Negative">Negative</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        )}
 
-                        <div className="space-y-2">
-                          <Label
-                            htmlFor={`range-${result.testCode}-${result.testName}-${index}`}
-                          >
-                            Reference Range
-                          </Label>
-                          <Input
-                            id={`range-${result.testCode}-${result.testName}-${index}`}
-                            value={result.referenceRange}
-                            onChange={(e) =>
-                              updateResult(
-                                result.testName,
-                                "referenceRange",
-                                e.target.value
-                              )
-                            }
-                            placeholder={`e.g. ${result.referenceRange}`}
-                          />
-                        </div>
-                      </div>
+        <div className="space-y-2">
+          <Label htmlFor={`unit-${result.testCode}-${result.testName}-${index}`}>
+            Unit
+          </Label>
+          <Input
+            id={`unit-${result.testCode}-${result.testName}-${index}`}
+            value={result.unit}
+            onChange={(e) => updateResult(result.testName, "unit", e.target.value)}
+            placeholder={`e.g., ${result.unit}`}
+          />
+        </div>
 
-                      <div className="space-y-2">
-                        <Label
-                          htmlFor={`comments-${result.testCode}-${result.testName}-${index}`}
-                        >
-                          Comments (Optional)
-                        </Label>
-                        <Textarea
-                          id={`comments-${result.testCode}-${result.testName}-${index}`}
-                          value={result.comments || ""}
-                          onChange={(e) =>
-                            updateResult(
-                              result.testName,
-                              "comments",
-                              e.target.value
-                            )
-                          }
-                          placeholder="Any additional comments about this result"
-                          rows={2}
-                        />
-                      </div>
-                    </div>
-                  ))}
+        <div className="space-y-2">
+          <Label htmlFor={`range-${result.testCode}-${result.testName}-${index}`}>
+            Reference Range
+          </Label>
+          <Input
+            id={`range-${result.testCode}-${result.testName}-${index}`}
+            value={result.referenceRange}
+            onChange={(e) => updateResult(result.testName, "referenceRange", e.target.value)}
+            placeholder={`e.g. ${result.referenceRange}`}
+          />
+        </div>
+      </div>
+
+      {!isQualitative && (
+        <div className="space-y-2">
+          <Label htmlFor={`comments-${result.testCode}-${result.testName}-${index}`}>
+            Comments (Optional)
+          </Label>
+          <Textarea
+            id={`comments-${result.testCode}-${result.testName}-${index}`}
+            value={result.comments || ""}
+            onChange={(e) => updateResult(result.testName, "comments", e.target.value)}
+            placeholder="Any additional comments about this result"
+            rows={2}
+          />
+        </div>
+      )}
+    </div>
+  );
+})}
                 </CardContent>
               </Card>
             )}

@@ -321,60 +321,70 @@ export default function ReportDetailsPage() {
     );
   };
 
-  const renderRegularTestResults = (testCode: string, testResults: any[]) => {
-    console.log("Rendering regular test results for:", testResults);
+ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
+  console.log("Rendering regular test results for:", testResults);
 
-    const dataManager = DataManager.getInstance();
+  const dataManager = DataManager.getInstance();
   const testConfig = dataManager.getTestByCode(testCode);
-  const testName = testConfig ? testConfig.name : testCode
-    return (
-      <div key={testCode}>
-        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-          {testName}
-        </h1>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Test</th>
-              <th className="text-left p-4">Value</th>
-              <th className="text-left p-4">Units</th>
-              <th className="text-left p-4">Reference Range</th>
-              {/* <th className="text-left p-4">Comments</th> */}
-            </tr>
-          </thead>
-          <tbody>
-            {testResults.map((result, index) => (
+  const testName = testConfig ? testConfig.name : testCode;
+  const isESR = testCode === "ESR";
+  
+  return (
+    <div key={testCode}>
+      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+        {testName}
+      </h1>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left p-4">Test</th>
+            <th className="text-left p-4">Value</th>
+            <th className="text-left p-4">Units</th>
+            {!isESR && <th className="text-left p-4">Reference Range</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {testResults.map((result, index) => {
+            const isQualitative = testConfig?.isQualitative || false;
+            
+            const displayName = result.testName.includes(' - ') 
+      ? result.testName.split(' - ')[1] 
+      : result.testName;
+            return (
               <tr key={`${testCode}-${index}`} className="border-b">
                 <td className="p-4">
                   <div className="flex items-center gap-2">
-                    {/* <Badge variant="outline">{result.testCode}</Badge> */}
-                    <span className="font-medium">{result.testName}</span>
+                    <span className="font-medium">{displayName}</span>
                   </div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">{result.value}</div>
+                  <div className="font-semibold text-lg">
+                    {result.value}
+                    {isQualitative && result.comments && (
+                      <span className="ml-2">
+                        ({result.comments})
+                      </span>
+                    )}
+                  </div>
                 </td>
                 <td className="p-4">
                   <div className="font-semibold text-lg">{result.unit}</div>
                 </td>
-                <td className="p-4">
-                  <div className="font-semibold text-lg">
-                    {result.referenceRange}
-                  </div>
-                </td>
-                {/* <td className="p-4">
-                {result.comments && (
-                  <p className="text-sm">{result.comments}</p>
+                {!isESR && (
+                  <td className="p-4">
+                    <div className="font-semibold text-lg">
+                      {result.referenceRange}
+                    </div>
+                  </td>
                 )}
-              </td> */}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
   const checkValueStatus = (value: string, referenceRange: string) => {
     // Returns 'normal', 'low', or 'high'
     if (!value || !referenceRange) return "normal";

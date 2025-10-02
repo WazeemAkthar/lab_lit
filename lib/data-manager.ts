@@ -21,6 +21,7 @@ export interface TestCatalogItem {
   unit: string;
   referenceRange: Record<string, string>;
   category: string;
+  isQualitative?: boolean;
 }
 
 export interface InvoiceLineItem {
@@ -179,9 +180,10 @@ export class DataManager {
         estimatedCost: 200.0,
         unit: "mg/l",
         referenceRange: {
-          CRP: "< = 6 mg/l (Negative)",
+          CRP: "< = 6",
         },
         category: "Biochemistry",
+        isQualitative: true,
       },
       {
         code: "LIPID",
@@ -269,9 +271,10 @@ export class DataManager {
         estimatedCost: 250.0,
         unit: "IU/ml",
         referenceRange: {
-          "Rheumatoid Factor": "< 8 IU/ml (Negative)",
+          "Rheumatoid Factor": "< 8",
         },
         category: "Immunology",
+        isQualitative: true,
       },
       {
         code: "ASOT",
@@ -280,9 +283,10 @@ export class DataManager {
         estimatedCost: 300.0,
         unit: "IU/l",
         referenceRange: {
-          ASOT: "< 200 IU/l (Negative)",
+          ASOT: "< 200",
         },
         category: "Immunology",
+        isQualitative: true,
       },
       {
         code: "VITAMIN_D",
@@ -371,6 +375,7 @@ export class DataManager {
           "HIV 1 & 2": "Negative",
         },
         category: "Immunology",
+        isQualitative: true, 
       },
       {
         code: "VDRL",
@@ -379,9 +384,10 @@ export class DataManager {
         estimatedCost: 180.0,
         unit: "per test",
         referenceRange: {
-          VDRL: "Non-Reactive (Negative)",
+          VDRL: " ",
         },
         category: "Immunology",
+        isQualitative: true,
       },
       {
         code: "UFR",
