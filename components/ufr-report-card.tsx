@@ -99,8 +99,8 @@ export function UFRReportCard({ onValuesChange }: UFRReportCardProps) {
                   <SelectItem value="Pale Yellow">Pale Yellow</SelectItem>
                   <SelectItem value="Dark Yellow">Dark Yellow</SelectItem>
                   <SelectItem value="Amber">Amber</SelectItem>
-                  <SelectItem value="Red">Red</SelectItem>
-                  <SelectItem value="Brown">Brown</SelectItem>
+                  <SelectItem value="Reddish">Reddish</SelectItem>
+                  <SelectItem value="Brownish">Brownish</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -118,6 +118,9 @@ export function UFRReportCard({ onValuesChange }: UFRReportCardProps) {
                   <SelectItem value="Clear">Clear</SelectItem>
                   <SelectItem value="Slightly Cloudy">
                     Slightly Cloudy
+                  </SelectItem>
+                  <SelectItem value="Slightly Turbid">
+                    Slightly Turbid
                   </SelectItem>
                   <SelectItem value="Cloudy">Cloudy</SelectItem>
                   <SelectItem value="Turbid">Turbid</SelectItem>

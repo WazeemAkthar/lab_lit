@@ -188,7 +188,7 @@ export default function NewReportPage() {
               testName: `${item.testName} - ${component}`,
               value: "",
               unit: test?.unit || "", // Use unit from test catalog
-              referenceRange: range, // Use reference range from catalog
+              referenceRange: String(range), // Use reference range from catalog
               comments: "",
             });
           });
@@ -200,7 +200,7 @@ export default function NewReportPage() {
             testName: item.testName,
             value: "",
             unit: test?.unit || "", // Use unit from test catalog
-            referenceRange: firstRange ? firstRange[1] : "",
+            referenceRange: firstRange ? String(firstRange[1]) : "",
             comments: "",
           });
         }
@@ -302,7 +302,7 @@ export default function NewReportPage() {
             testName: `${test?.name} - ${component}`,
             value: "",
             unit: test?.unit || "", // Use unit from test catalog
-            referenceRange: range, // Use reference range from catalog
+             referenceRange: String(range), // Use reference range from catalog
             comments: "",
           });
         });
@@ -314,7 +314,7 @@ export default function NewReportPage() {
           testName: test?.name || testCode,
           value: "",
           unit: test?.unit || "", // Use unit from test catalog
-          referenceRange: firstRange ? firstRange[1] : "",
+          referenceRange: firstRange ? String(firstRange[1]) : "",
           comments: "",
         });
       }

@@ -19,9 +19,10 @@ export interface TestCatalogItem {
   defaultPrice: number;
   estimatedCost: number;
   unit: string;
-  referenceRange: Record<string, string>;
+  referenceRange: Record<string, string | Record<string, string>>;
   category: string;
   isQualitative?: boolean;
+  unitPerTest?: Record<string, string>;
 }
 
 export interface InvoiceLineItem {
@@ -350,7 +351,7 @@ export class DataManager {
         estimatedCost: 100.0,
         unit: "mg/dL",
         referenceRange: {
-          Creatinine: "0.6-1.2 mg/dL",
+          Creatinine: "0.5 - 1.5",
         },
         category: "Biochemistry",
       },
@@ -446,19 +447,6 @@ export class DataManager {
         category: "Biochemistry",
       },
       {
-        code: "SE",
-        name: "Serum Electrolytes",
-        defaultPrice: 500.0,
-        estimatedCost: 150.0,
-        unit: "mEq/l",
-        referenceRange: {
-          "Serum Sodium": "135.0 - 145.0 ",
-          "Serum Potassium": "3.5 - 5.5",
-          "Serum Chloride": "95.0 - 110.0",
-        },
-        category: "Biochemistry",
-      },
-      {
         code: "UA",
         name: "Blood for Uric Acid",
         defaultPrice: 400.0,
@@ -466,6 +454,187 @@ export class DataManager {
         unit: "mg/dL",
         referenceRange: {
           "Uric Acid": "3.4 - 7.2",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "AMY",
+        name: "Serum Amylase",
+        defaultPrice: 350.0,
+        estimatedCost: 105.0,
+        unit: "IU/l",
+        referenceRange: {
+          Amylase: "36.0 - 115.0",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "BSS",
+        name: "Blood for BSS",
+        defaultPrice: 450.0,
+        estimatedCost: 135.0,
+        unit: "mg/dL",
+        referenceRange: {
+          "Post Prandial Blood Sugar (Post Breakfast / Post Lunch / Post Dinner) - After 01 Hour":
+            "< 160",
+        },
+        category: "Glucose",
+      },
+      {
+        code: "BTCT",
+        name: "Bleeding Time & Clotting Time",
+        defaultPrice: 400.0,
+        estimatedCost: 120.0,
+        unit: "Min",
+        referenceRange: {
+          "Bleeding Time": "2 - 8",
+          "Clotting Time": "3 - 10",
+        },
+        category: "Coagulation",
+      },
+      {
+        code: "BUN",
+        name: "Blood Urea Nitrogen (BUN)",
+        defaultPrice: 350.0,
+        estimatedCost: 105.0,
+        unit: "mg/dL",
+        referenceRange: {
+          "Blood Urea Nitrogen (BUN)": "7.0 - 20.0",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "SCC",
+        name: "Serum Corrected Calcium",
+        defaultPrice: 400.0,
+        estimatedCost: 120.0,
+        unit: "mg/dL or g/dL",
+        referenceRange: {
+          "Serum Total Calcium": "8.5 - 10.8",
+          "Serum Albumin": "4.0 - 6.0",
+          "Corrected Calcium": "8.5 - 10.8",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "FT3",
+        name: "Free Triiodothyronine (Free T3)",
+        defaultPrice: 500.0,
+        estimatedCost: 150.0,
+        unit: "pg/mL",
+        referenceRange: {
+          "Free T3": "2.3 - 4.2",
+        },
+        category: "Hormone",
+      },
+      {
+        code: "DEN",
+        name: "Dengue Antibody",
+        defaultPrice: 600.0,
+        estimatedCost: 180.0,
+        unit: "qualitative",
+        referenceRange: {
+          "Dengue Antibody IgM": "Negative",
+          "Dengue Antibody IgG": "Negative",
+        },
+        category: "Infectious Disease",
+        isQualitative: true,
+      },
+      {
+        code: "FER",
+        name: "Ferritin",
+        defaultPrice: 450.0,
+        estimatedCost: 135.0,
+        unit: "ng/mL",
+        referenceRange: {
+          Ferritin: "20.0 - 250.0",
+        },
+        category: "Hematology",
+      },
+      {
+        code: "HB",
+        name: "Haemoglobin",
+        defaultPrice: 300.0,
+        estimatedCost: 90.0,
+        unit: "g/dL",
+        referenceRange: {
+          Haemoglobin: {
+            Man: "13.0 - 18.0",
+            Woman: "11.0 - 16.5",
+          },
+        },
+        category: "Hematology",
+      },
+      {
+        code: "HBsAg",
+        name: "Hepatitis B Surface Antigen (HBs Ag)",
+        defaultPrice: 550.0,
+        estimatedCost: 165.0,
+        unit: "qualitative",
+        referenceRange: {
+          HBsAg: "Negative",
+        },
+        category: "Infectious Disease",
+        isQualitative: true,
+      },
+      {
+        code: "ALP",
+        name: "Alkaline Phosphatase (ALP)",
+        defaultPrice: 300.0,
+        estimatedCost: 90.0,
+        unit: "IU/l",
+        referenceRange: {
+          "Alkaline Phosphatase": "35.0 - 173.0",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "HCG",
+        name: "Blood for Serum H.C.G (Qualitative)",
+        defaultPrice: 400.0,
+        estimatedCost: 120.0,
+        unit: "qualitative",
+        referenceRange: {
+          "Human Chorionic Gonadotropin": "Negative",
+        },
+        category: "Hormone",
+        isQualitative: true,
+      },
+      {
+        code: "APTT",
+        name: "Activated Partial Thromboplastin Time (APTT)",
+        defaultPrice: 500.0,
+        estimatedCost: 150.0,
+        unit: "Sec",
+        referenceRange: {
+          APTT: "25 - 38",
+          Control: "25 - 38",
+        },
+        category: "Coagulation",
+      },
+      {
+        code: "BGRh",
+        name: "Blood Grouping & Rh",
+        defaultPrice: 250.0,
+        estimatedCost: 75.0,
+        unit: "qualitative",
+        referenceRange: {
+          "Blood group": "Any (A, B, AB, O)",
+          "Rhesus factor": "Positive or Negative",
+        },
+        category: "Hematology",
+        isQualitative: true,
+      },
+      {
+        code: "SE",
+        name: "Serum Electrolytes",
+        defaultPrice: 500.0,
+        estimatedCost: 150.0,
+        unit: "mEq/l",
+        referenceRange: {
+          "Serum Sodium": "135.0 - 145.0",
+          "Serum Potassium": "3.5 - 5.5",
+          "Serum Chloride": "95.0 - 110.0",
         },
         category: "Biochemistry",
       },
@@ -484,6 +653,58 @@ export class DataManager {
         },
         category: "Andrology",
       },
+      {
+        code: "BTP",
+        name: "Blood for Total Protein",
+        defaultPrice: 350.0,
+        estimatedCost: 105.0,
+        unit: "g/dL",
+        referenceRange: {
+          "Total Protein": "6.6 - 8.3",
+          Albumin: "2.5 - 6.0",
+          Globulin: "1.2 - 3.3",
+          "A/G Ratio": "1.2 - 3.3",
+        },
+        category: "Biochemistry",
+      },
+      {
+        code: "UACR",
+        name: "Urine Albumin with Creatinine Ratio",
+        defaultPrice: 400.0,
+        estimatedCost: 120.0,
+        unit: "mg/dL or mg of Alb/g of Cre",
+        referenceRange: {
+          "Urine Creatinine": "20.0 - 100.0",
+          "Urine Albumin": "0.0 - 30.0",
+          "Urine Albumin/Urine Creatinine": "< 30.0",
+        },
+        category: "Renal",
+      },
+      {
+  code: "RFT",
+  name: "Renal Function Test",
+  defaultPrice: 500.0,
+  estimatedCost: 150.0,
+  unit: "mg/dL or mEq/l or ml/min/1.73m2",
+  referenceRange: {
+    "Serum Creatinine": "0.50 - 1.50",
+    "Estimated GFR": "> 60",
+    "Blood Urea": "10.0 - 45.0",
+    "Serum Sodium": "135.0 - 155.0",
+    "Serum Potassium": "3.5 - 5.5",
+    "Serum Chloride": "95.0 - 110.0",
+  },
+  unitPerTest: {
+    "Serum Creatinine": "mg/dL",
+    "Estimated GFR": "ml/min/1.73m2",
+    "Blood Urea": "mg/dL",
+    "Serum Sodium": "mEq/l",
+    "Serum Potassium": "mEq/l",
+    "Serum Chloride": "mEq/l",
+  },
+  category: "Renal",
+}
+
     ];
   }
 
