@@ -251,16 +251,22 @@ export class DataManager {
         category: "Biochemistry",
       },
       {
-        code: "LIVER",
+        code: "LFT",
         name: "Liver Function Tests",
         defaultPrice: 1800.0,
         estimatedCost: 600.0,
         unit: "per test",
         referenceRange: {
-          ALT: "7-56 U/L",
-          AST: "10-40 U/L",
-          "Bilirubin Total": "0.3-1.2 mg/dL",
-          Albumin: "3.5-5.0 g/dL",
+          "Bilirubin Total": "0.30 - 1.20",
+          "Alkaline Phosphatase": "35.0 - 173.0",
+          "SGOT/AST": "5.0 - 42.0",
+          "SGPT/ALT": "4.0 - 42.0",
+        },
+        unitPerTest: {
+          "Bilirubin Total": "mg/dl",
+          "Alkaline Phosphatase": "IU/l",
+          "SGOT/AST": "IU/l",
+          "SGPT/ALT": "IU/l",
         },
         category: "Biochemistry",
       },
@@ -318,7 +324,7 @@ export class DataManager {
         estimatedCost: 60.0,
         unit: "mg/dL",
         referenceRange: {
-          Glucose: "70-140",
+          Glucose: "70 - 140",
         },
         category: "Biochemistry",
       },
@@ -329,9 +335,27 @@ export class DataManager {
         estimatedCost: 120.0,
         unit: "IU/L",
         referenceRange: {
-          AST: "< 40",
+          AST: "< 42",
         },
         category: "Biochemistry",
+      },
+            {
+        code: "BILIRUBIN",
+        name: "Bilirubin Total, Direct & Indirect",
+        defaultPrice: 800.0,
+        estimatedCost: 250.0,
+        unit: "mg/dl",
+        referenceRange: {
+          "Serum Bilirubin (Total)": "0.2 - 1.2",
+          "Serum Bilirubin (Direct)": "0 - 0.3",
+          "Serum Bilirubin (Indirect)": "0.2 - 1"
+        },
+        unitPerTest: {
+          "Serum Bilirubin (Total)": "mg/dl",
+          "Serum Bilirubin (Direct)": "mg/dl",
+          "Serum Bilirubin (Indirect)": "mg/dl"
+        },
+        category: "Biochemistry"
       },
       {
         code: "SGPT",
@@ -429,9 +453,9 @@ export class DataManager {
         estimatedCost: 120.0,
         unit: "mg/dL",
         referenceRange: {
-          Fasting: "70-99",
-          "After 1 Hour": "<180",
-          "After 2 Hours": "70-140",
+          // Fasting: "70-99",
+          // "After 1 Hour": "<180",
+          "After 2 Hours": "<140",
         },
         category: "Biochemistry",
       },
@@ -513,6 +537,11 @@ export class DataManager {
           "Serum Total Calcium": "8.5 - 10.8",
           "Serum Albumin": "4.0 - 6.0",
           "Corrected Calcium": "8.5 - 10.8",
+        },
+        unitPerTest: {
+          "Serum Total Calcium": "mg/dL",
+          "Serum Albumin": "g/dL",
+          "Corrected Calcium": "mg/dL",
         },
         category: "Biochemistry",
       },
@@ -668,19 +697,6 @@ export class DataManager {
         category: "Biochemistry",
       },
       {
-        code: "UACR",
-        name: "Urine Albumin with Creatinine Ratio",
-        defaultPrice: 400.0,
-        estimatedCost: 120.0,
-        unit: "mg/dL or mg of Alb/g of Cre",
-        referenceRange: {
-          "Urine Creatinine": "20.0 - 100.0",
-          "Urine Albumin": "0.0 - 30.0",
-          "Urine Albumin/Urine Creatinine": "< 30.0",
-        },
-        category: "Renal",
-      },
-      {
         code: "RFT",
         name: "Renal Function Test",
         defaultPrice: 500.0,
@@ -690,7 +706,7 @@ export class DataManager {
           "Serum Creatinine": "0.50 - 1.50",
           "Estimated GFR": "> 60",
           "Blood Urea": "10.0 - 45.0",
-          "Serum Sodium": "135.0 - 155.0",
+          "Serum Sodium": "135.0 - 145.0",
           "Serum Potassium": "3.5 - 5.5",
           "Serum Chloride": "95.0 - 110.0",
         },
@@ -714,7 +730,20 @@ export class DataManager {
           "Free T4": "0.8 - 1.8",
         },
         category: "Hormone",
-      }
+      },
+      {
+        code: "UACR",
+        name: "Urine Albumin with Creatinine Ratio",
+        defaultPrice: 400.0,
+        estimatedCost: 120.0,
+        unit: "mg/dL or mg of Alb/g of Cre",
+        referenceRange: {
+          "Urine Creatinine": "20.0 - 300.0 mg/dL",
+          "Urine Albumin": "0.0 - 30.0 mg/dL",
+          "Urine Albumin/Urine Creatinine": "< 30.0 mg of Alb/g of Cre",
+        },
+        category: "Renal",
+      },
     ];
   }
 
