@@ -23,6 +23,7 @@ export interface TestCatalogItem {
   category: string;
   isQualitative?: boolean;
   unitPerTest?: Record<string, string>;
+  hasGraph?: boolean;
 }
 
 export interface InvoiceLineItem {
@@ -445,6 +446,7 @@ export class DataManager {
           "After 2 Hours": "70-140",
         },
         category: "Biochemistry",
+        hasGraph: true,
       },
       {
         code: "OGCT",
