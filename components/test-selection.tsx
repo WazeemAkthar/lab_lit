@@ -1,5 +1,4 @@
 "use client"
-
 import { useState, useEffect } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Checkbox } from "@/components/ui/checkbox"
@@ -17,11 +16,16 @@ export function TestSelectionComponent({ selectedTests, onTestsChange }: TestSel
   const [testCatalog, setTestCatalog] = useState<any[]>([])
   const [searchTerm, setSearchTerm] = useState("")
   const [isUpdating, setIsUpdating] = useState(false)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const dataManager = DataManager.getInstance()
-    const catalog = dataManager.getTestCatalog()
-    setTestCatalog(catalog)
+    async function loadCatalog() {
+      const dataManager = DataManager.getInstance()
+      const catalog = await dataManager.getTestCatalog()
+      setTestCatalog(catalog)
+      setLoading(false)
+    }
+    loadCatalog()
   }, [])
 
   const handleTestToggle = (testCode: string) => {
@@ -43,6 +47,22 @@ export function TestSelectionComponent({ selectedTests, onTestsChange }: TestSel
     }, 100)
   }
 
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Select Tests</CardTitle>
+          <CardDescription>Loading tests...</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   const filteredTests = testCatalog.filter(test =>
     test.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     test.code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -57,6 +77,8 @@ export function TestSelectionComponent({ selectedTests, onTestsChange }: TestSel
     groups[category].push(test)
     return groups
   }, {} as Record<string, any[]>)
+
+
 
   return (
     <Card>
@@ -80,7 +102,7 @@ export function TestSelectionComponent({ selectedTests, onTestsChange }: TestSel
 
         {/* Test Categories */}
         <div className="space-y-6">
-          {Object.entries(groupedTests).map(([category, tests]: [string, any[]]) => (
+          {Object.entries(groupedTests as Record<string, any[]>).map(([category, tests]) => (
             <div key={category} className="space-y-3">
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">{category}</Badge>
