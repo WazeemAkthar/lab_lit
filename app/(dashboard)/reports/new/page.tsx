@@ -35,6 +35,7 @@ import { useAuth } from "@/components/auth-provider";
 import Link from "next/link";
 import { UFRReportCard } from "@/components/ufr-report-card";
 import { LipidProfileReportCard } from "@/components/lipid-profile-report-card";
+import { OGTTGraph } from "@/components/ogtt-graph";
 
 // Helper function to extract unit from reference range
 function getUnitFromRange(range: string): string {
@@ -125,6 +126,7 @@ export default function NewReportPage() {
   const [pathologyReport, setPathologyReport] = useState<any>(null);
   const [lipidValues, setLipidValues] = useState<any>(null);
   const [ufrValues, setUfrValues] = useState<any>(null);
+  const [ogttValues, setOgttValues] = useState<any>(null);
 
   const hasUFRTest = useDirectTestSelection
     ? selectedTests.includes("UFR")
@@ -134,6 +136,11 @@ export default function NewReportPage() {
   const hasLipidProfileTest = useDirectTestSelection
     ? selectedTests.includes("LIPID")
     : selectedInvoice?.lineItems.some((item) => item.testCode === "LIPID") ||
+      false;
+
+  const hasOGTTTest = useDirectTestSelection
+    ? selectedTests.includes("OGTT")
+    : selectedInvoice?.lineItems.some((item) => item.testCode === "OGTT") ||
       false;
 
   useEffect(() => {
@@ -165,12 +172,18 @@ export default function NewReportPage() {
     setUseDirectTestSelection(false);
     setResults([]);
     setFbcValues(null);
+    setLipidValues(null);
+    setUfrValues(null);
+    setOgttValues(null);
   };
 
   const handleInvoiceChange = async (invoiceId: string) => {
     const invoice = invoices.find((inv) => inv.id === invoiceId);
     setSelectedInvoice(invoice || null);
     setFbcValues(null);
+    setLipidValues(null);
+    setUfrValues(null);
+    setOgttValues(null);
 
     if (invoice) {
       // Initialize results from invoice line items
@@ -183,11 +196,12 @@ export default function NewReportPage() {
         const test = testCatalog.find((t) => t.code === item.testCode);
         const referenceRanges = test?.referenceRange || {};
 
-        // Handle FBC, LIPID specially - don't create individual result entries
+        // Handle FBC, LIPID, UFR, OGTT specially - don't create individual result entries
         if (
           item.testCode === "FBC" ||
           item.testCode === "LIPID" ||
-          item.testCode === "UFR"
+          item.testCode === "UFR" ||
+          item.testCode === "OGTT"
         ) {
           return;
         }
@@ -304,8 +318,8 @@ export default function NewReportPage() {
       const test = testCatalog.find((t) => t.code === testCode);
       const referenceRanges = test?.referenceRange || {};
 
-      // Handle FBC, LIPID specially - don't create individual result entries
-      if (testCode === "FBC" || testCode === "LIPID" || testCode === "UFR") {
+      // Handle FBC, LIPID, UFR, OGTT specially - don't create individual result entries
+      if (testCode === "FBC" || testCode === "LIPID" || testCode === "UFR" || testCode === "OGTT") {
         return;
       }
 
@@ -345,6 +359,11 @@ if (Object.keys(referenceRanges).length > 1) {
     ufrValues &&
     hasUFRTest &&
     Object.values(ufrValues).some((v) => v && String(v).trim() !== "");
+
+  const hasOGTTResults =
+    ogttValues &&
+    hasOGTTTest &&
+    (ogttValues.fasting || ogttValues.afterOneHour || ogttValues.afterTwoHours);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -732,6 +751,37 @@ if (Object.keys(referenceRanges).length > 1) {
         allResults.push(...ufrResults);
       }
 
+      if (ogttValues && hasOGTTTest) {
+        const ogttResults = [
+          {
+            testCode: "OGTT",
+            testName: "Fasting Glucose",
+            value: ogttValues.fasting,
+            unit: "mg/dL",
+            referenceRange: "70-100",
+            comments: "",
+          },
+          {
+            testCode: "OGTT",
+            testName: "1 Hour Glucose",
+            value: ogttValues.afterOneHour,
+            unit: "mg/dL",
+            referenceRange: "< 140",
+            comments: "",
+          },
+          {
+            testCode: "OGTT",
+            testName: "2 Hour Glucose",
+            value: ogttValues.afterTwoHours,
+            unit: "mg/dL",
+            referenceRange: "< 140",
+            comments: "",
+          },
+        ].filter((r) => r.value && r.value.trim() !== "");
+
+        allResults.push(...ogttResults);
+      }
+
       if (allResults.length === 0) return;
 
       const report = await dataManager.addReport({
@@ -782,7 +832,8 @@ if (Object.keys(referenceRanges).length > 1) {
         hasFBCResults ||
         hasLipidResults ||
         hasPathologyResults ||
-        hasUFRResults) &&
+        hasUFRResults ||
+        hasOGTTResults) &&
       reviewedBy.trim() !== ""
     );
   };
@@ -968,7 +1019,8 @@ if (Object.keys(referenceRanges).length > 1) {
         {(results.length > 0 ||
           hasFBCTest ||
           hasLipidProfileTest ||
-          hasUFRTest) && (
+          hasUFRTest ||
+          hasOGTTTest) && (
           <div className="space-y-6">
             {/* FBC Test - Special Component */}
             {hasFBCTest && (
@@ -980,6 +1032,79 @@ if (Object.keys(referenceRanges).length > 1) {
             )}
 
             {hasUFRTest && <UFRReportCard onValuesChange={setUfrValues} />}
+
+            {hasOGTTTest && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TestTube className="h-5 w-5" />
+                    OGTT - Oral Glucose Tolerance Test
+                  </CardTitle>
+                  <CardDescription>
+                    Enter fasting, 1-hour, and 2-hour glucose values
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label htmlFor="ogtt-fasting">Fasting Glucose (mg/dL)</Label>
+                      <Input
+                        id="ogtt-fasting"
+                        type="number"
+                        value={ogttValues?.fasting || ""}
+                        onChange={(e) =>
+                          setOgttValues({
+                            ...ogttValues,
+                            fasting: e.target.value,
+                          })
+                        }
+                        placeholder="70-100"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ogtt-1hour">1 Hour Glucose (mg/dL)</Label>
+                      <Input
+                        id="ogtt-1hour"
+                        type="number"
+                        value={ogttValues?.afterOneHour || ""}
+                        onChange={(e) =>
+                          setOgttValues({
+                            ...ogttValues,
+                            afterOneHour: e.target.value,
+                          })
+                        }
+                        placeholder="< 140"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="ogtt-2hour">2 Hour Glucose (mg/dL)</Label>
+                      <Input
+                        id="ogtt-2hour"
+                        type="number"
+                        value={ogttValues?.afterTwoHours || ""}
+                        onChange={(e) =>
+                          setOgttValues({
+                            ...ogttValues,
+                            afterTwoHours: e.target.value,
+                          })
+                        }
+                        placeholder="< 140"
+                      />
+                    </div>
+                  </div>
+                  {ogttValues &&
+                    (ogttValues.fasting ||
+                      ogttValues.afterOneHour ||
+                      ogttValues.afterTwoHours) && (
+                      <OGTTGraph
+                        fasting={ogttValues.fasting || ""}
+                        afterOneHour={ogttValues.afterOneHour || ""}
+                        afterTwoHours={ogttValues.afterTwoHours || ""}
+                      />
+                    )}
+                </CardContent>
+              </Card>
+            )}
 
             {/* Other Tests */}
             {results.length > 0 && (
@@ -1141,7 +1266,11 @@ if (Object.keys(referenceRanges).length > 1) {
         )}
 
         {/* Doctor's Remarks */}
-        {(results.length > 0 || hasFBCTest || hasLipidProfileTest) && (
+        {(results.length > 0 ||
+          hasFBCTest ||
+          hasLipidProfileTest ||
+          hasUFRTest ||
+          hasOGTTTest) && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
