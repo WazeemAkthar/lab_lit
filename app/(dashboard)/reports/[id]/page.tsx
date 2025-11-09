@@ -41,6 +41,7 @@ export default function ReportDetailsPage() {
       const reportData = allReports.find((rep) => rep.id === reportId);
 
       if (!reportData) {
+        // Report not found, redirect to reports list
         router.push("/reports");
         return;
       }
@@ -62,6 +63,10 @@ export default function ReportDetailsPage() {
         }
       }
       setTestConfigs(configs);
+
+      setLoading(false);
+    }
+
 
       setLoading(false);
     }

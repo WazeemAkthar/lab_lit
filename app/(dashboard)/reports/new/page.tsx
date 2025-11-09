@@ -788,6 +788,14 @@ const handleSubmit = async (e: React.FormEvent) => {
 
       allResults.push(...filteredOgttResults);
     }
+      const report = await dataManager.addReport({
+        patientId: selectedPatient.id,
+        patientName: `${selectedPatient.firstName} ${selectedPatient.lastName}`,
+        invoiceId: selectedInvoice?.id || null,
+        results: allResults,
+        doctorRemarks,
+        reviewedBy,
+      });
 
     if (allResults.length === 0) {
       console.error("No results to save!");
