@@ -748,46 +748,50 @@ const handleSubmit = async (e: React.FormEvent) => {
       allResults.push(...ufrResults);
     }
 
-    // Add OGTT results if available - FIXED VERSION
-    if (ogttValues && hasOGTTTest) {
-      console.log("=== SAVING OGTT DATA ===");
-      console.log("ogttValues:", ogttValues);
-      
-      const ogttResultsArray = [
-        {
-          testCode: "OGTT",
-          testName: "Fasting",
-          value: ogttValues.fasting || "",
-          unit: "mg/dL",
-          referenceRange: "60 - 115",
-          comments: "",
-        },
-        {
-          testCode: "OGTT",
-          testName: "After 1 Hour",
-          value: ogttValues.afterOneHour || "",
-          unit: "mg/dL",
-          referenceRange: "< 180",
-          comments: "",
-        },
-        {
-          testCode: "OGTT",
-          testName: "After 2 Hour",
-          value: ogttValues.afterTwoHours || "",
-          unit: "mg/dL",
-          referenceRange: "< 140",
-          comments: "",
-        },
-      ];
-      
-      console.log("OGTT results before filter:", ogttResultsArray);
-      
-      const filteredOgttResults = ogttResultsArray.filter((r) => r.value && r.value.trim() !== "");
-      
-      console.log("OGTT results after filter:", filteredOgttResults);
+  // Add OGTT results if available
+if (ogttValues && hasOGTTTest) {
+  console.log("=== SAVING OGTT DATA ===");
+  console.log("ogttValues:", ogttValues);
+  
+  const ogttResultsArray = [];
+  
+  if (ogttValues.fasting && ogttValues.fasting.trim() !== "") {
+    ogttResultsArray.push({
+      testCode: "OGTT",
+      testName: "Fasting Glucose",
+      value: ogttValues.fasting,
+      unit: "mg/dL",
+      referenceRange: "60 - 115",
+      comments: "",
+    });
+  }
+  
+  if (ogttValues.afterOneHour && ogttValues.afterOneHour.trim() !== "") {
+    ogttResultsArray.push({
+      testCode: "OGTT",
+      testName: "After 1 Hour Glucose",
+      value: ogttValues.afterOneHour,
+      unit: "mg/dL",
+      referenceRange: "< 180",
+      comments: "",
+    });
+  }
+  
+  if (ogttValues.afterTwoHours && ogttValues.afterTwoHours.trim() !== "") {
+    ogttResultsArray.push({
+      testCode: "OGTT",
+      testName: "After 2 Hour Glucose",
+      value: ogttValues.afterTwoHours,
+      unit: "mg/dL",
+      referenceRange: "< 140",
+      comments: "",
+    });
+  }
+  
+  console.log("OGTT results to save:", ogttResultsArray);
 
-      allResults.push(...filteredOgttResults);
-    }
+  allResults.push(...ogttResultsArray);
+}
 
     if (allResults.length === 0) {
       console.error("No results to save!");

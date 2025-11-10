@@ -136,38 +136,125 @@ export default function ReportDetailsPage() {
     }
   };
 
-  const renderTestResults = (results: any[]) => {
-    const groupedResults = results.reduce((groups, result) => {
-      const testCode = result.testCode;
-      if (!groups[testCode]) {
-        groups[testCode] = [];
-      }
-      groups[testCode].push(result);
-      return groups;
-    }, {} as Record<string, any[]>);
+const renderTestResults = (results: any[]) => {
+  console.log("=== RENDERING ALL TEST RESULTS ===");
+  console.log("Total results:", results.length);
+  console.log("Results:", results);
+  
+  const groupedResults = results.reduce((groups, result) => {
+    const testCode = result.testCode;
+    if (!groups[testCode]) {
+      groups[testCode] = [];
+    }
+    groups[testCode].push(result);
+    return groups;
+  }, {} as Record<string, any[]>);
 
-    return (
-      <div className="space-y-6">
-        {Object.entries(groupedResults).map(([testCode, testResults]) => {
-          const resultsArray = testResults as any[];
-          if (testCode === "FBC") {
-            return <div key={testCode}>{renderFBCResults(resultsArray)}</div>;
-          } else if (testCode === "UFR") {
-            return <div key={testCode}>{renderUFRResults(resultsArray)}</div>;
-          } else {
-            return (
-              <div key={testCode}>
-                {renderRegularTestResults(testCode, resultsArray)}
-                <div className="mt-[5rem]">
-                  <TestAdditionalDetails testCode={testCode} />
-                </div>
+  console.log("Grouped results:", groupedResults);
+
+  return (
+    <div className="space-y-6">
+      {Object.entries(groupedResults).map(([testCode, testResults]) => {
+        console.log(`Rendering testCode: ${testCode}, results:`, testResults);
+        
+        const resultsArray = testResults as any[];
+        if (testCode === "FBC") {
+          return <div key={testCode}>{renderFBCResults(resultsArray)}</div>;
+        } else if (testCode === "UFR") {
+          return <div key={testCode}>{renderUFRResults(resultsArray)}</div>;
+        } else if (testCode === "OGTT") {
+          return <div key={testCode}>{renderOGTTResults(resultsArray)}</div>;
+        } else {
+          return (
+            <div key={testCode}>
+              {renderRegularTestResults(testCode, resultsArray)}
+              <div className="mt-[5rem]">
+                <TestAdditionalDetails testCode={testCode} />
               </div>
-            );
-          }
-        })}
+            </div>
+          );
+        }
+      })}
+    </div>
+  );
+};
+
+const renderOGTTResults = (ogttResults: any[]) => {
+  console.log("=== RENDERING OGTT RESULTS ===");
+  console.log("OGTT Results:", ogttResults);
+  
+  const fastingResult = ogttResults.find((r) =>
+    r.testName.includes("Fasting")
+  );
+  const oneHourResult = ogttResults.find((r) =>
+    r.testName.includes("1 Hour")
+  );
+  const twoHoursResult = ogttResults.find((r) =>
+    r.testName.includes("2 Hour")
+  );
+
+  console.log("Fasting:", fastingResult);
+  console.log("1 Hour:", oneHourResult);
+  console.log("2 Hours:", twoHoursResult);
+
+  const fastingValue = fastingResult?.value || "";
+  const oneHourValue = oneHourResult?.value || "";
+  const twoHoursValue = twoHoursResult?.value || "";
+
+  console.log("Values extracted - Fasting:", fastingValue, "1H:", oneHourValue, "2H:", twoHoursValue);
+
+  return (
+    <div key="OGTT" className="border rounded-lg p-6 ogtt-section">
+      <div className="flex items-center gap-2 mb-6">
+        <Badge variant="outline" className="text-lg px-3 py-1">
+          OGTT
+        </Badge>
+        <span className="font-semibold text-lg">Oral Glucose Tolerance Test</span>
       </div>
-    );
-  };
+
+      <div className="overflow-x-auto mb-6">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-collapse border-t-2 border-b-2 border-gray-900">
+              <th className="text-left font-semibold">Test</th>
+              <th className="text-right font-semibold">Result</th>
+              <th className="text-right font-semibold">Units</th>
+              <th className="text-right font-semibold">Reference Range</th>
+            </tr>
+          </thead>
+          <tbody>
+            {ogttResults.map((result, index) => {
+              const displayName = result.testName.replace("Glucose", "").trim();
+              return (
+                <tr key={index} className="border-0 font-mono p-0 table-row">
+                  <td className="py-0 font-mono">{displayName}</td>
+                  <td className="text-right py-0 font-mono font-bold">
+                    {result.value}
+                  </td>
+                  <td className="text-right py-0 font-mono">{result.unit}</td>
+                  <td className="text-right py-0 font-mono">
+                    {result.referenceRange}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Graph Section */}
+      {(fastingValue || oneHourValue || twoHoursValue) && (
+        <div className="mt-6 ogtt-graph-wrapper">
+          <OGTTGraph
+            fasting={fastingValue}
+            afterOneHour={oneHourValue}
+            afterTwoHours={twoHoursValue}
+          />
+        </div>
+      )}
+    </div>
+  );
+};
 
   const renderFBCResults = (fbcResults: any[]) => {
     const mainParams = fbcResults.filter((result) =>
@@ -373,137 +460,60 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
   const isTSH = testCode === "TSH";
   const hideReferenceRange = isESR || isTSH;
 
-  const hasGraph = testConfig?.hasGraph || false;
-  const isOGTT = testCode === "OGTT";
-  
-  if (isOGTT && hasGraph) {
-    const fastingResult = testResults.find((r) =>
-      r.testName.includes("Fasting")
-    );
-    const oneHourResult = testResults.find((r) =>
-      r.testName.includes("1 Hour")
-    );
-    const twoHoursResult = testResults.find((r) =>
-      r.testName.includes("2 Hour")
-    );
+  return (
+    <div key={testCode}>
+      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+        {testName}
+      </h1>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left p-4">Test</th>
+            <th className="text-left p-4">Value</th>
+            <th className="text-left p-4">Units</th>
+            {!hideReferenceRange && <th className="text-left p-4">Reference Range</th>}
+          </tr>
+        </thead>
+        <tbody>
+          {testResults.map((result, index) => {
+            const isQualitative = testConfig?.isQualitative || false;
 
-    const fastingValue = fastingResult?.value || "0";
-    const oneHourValue = oneHourResult?.value || "0";
-    const twoHoursValue = twoHoursResult?.value || "0";
-
-    return (
-      <div key={testCode} className="space-y-4 ogtt-section">
-        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-          {testName}
-        </h1>
-
-        <table className="w-full border-collapse mt-4">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Test</th>
-              <th className="text-left p-4">Value</th>
-              <th className="text-left p-4">Units</th>
-              <th className="text-left p-4">Reference Range</th>
-            </tr>
-          </thead>
-          <tbody>
-            {testResults.map((result, index) => {
-              const displayName = result.testName.includes(" - ")
-                ? result.testName.split(" - ")[1]
-                : result.testName;
-              return (
-                <tr key={`${testCode}-${index}`} className="border-b">
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{displayName}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="font-semibold text-lg">
-                      {result.value}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="font-semibold text-lg">{result.unit}</div>
-                  </td>
+            const displayName = result.testName.includes(" - ")
+              ? result.testName.split(" - ")[1]
+              : result.testName;
+            return (
+              <tr key={`${testCode}-${index}`} className="border-b">
+                <td className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="font-medium">{displayName}</span>
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="font-semibold text-lg">
+                    {result.value}
+                    {isQualitative && result.comments && (
+                      <span className="ml-2">({result.comments})</span>
+                    )}
+                  </div>
+                </td>
+                <td className="p-4">
+                  <div className="font-semibold text-lg">{result.unit}</div>
+                </td>
+                {!hideReferenceRange && (
                   <td className="p-4">
                     <div className="font-semibold text-lg">
                       {result.referenceRange}
                     </div>
                   </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {fastingValue && oneHourValue && twoHoursValue && (
-          <div className="mt-6 ogtt-graph-wrapper">
-            <OGTTGraph
-              fasting={fastingValue}
-              afterOneHour={oneHourValue}
-              afterTwoHours={twoHoursValue}
-            />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-    return (
-      <div key={testCode}>
-        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-          {testName}
-        </h1>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Test</th>
-              <th className="text-left p-4">Value</th>
-              <th className="text-left p-4">Units</th>
-              {!hideReferenceRange && <th className="text-left p-4">Reference Range</th>}
-            </tr>
-          </thead>
-          <tbody>
-            {testResults.map((result, index) => {
-              const isQualitative = testConfig?.isQualitative || false;
-
-              const displayName = result.testName.includes(" - ")
-                ? result.testName.split(" - ")[1]
-                : result.testName;
-              return (
-                <tr key={`${testCode}-${index}`} className="border-b">
-                  <td className="p-4">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{displayName}</span>
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="font-semibold text-lg">
-                      {result.value}
-                      {isQualitative && result.comments && (
-                        <span className="ml-2">({result.comments})</span>
-                      )}
-                    </div>
-                  </td>
-                  <td className="p-4">
-                    <div className="font-semibold text-lg">{result.unit}</div>
-                  </td>
-                  {!hideReferenceRange && (
-                    <td className="p-4">
-                      <div className="font-semibold text-lg">
-                        {result.referenceRange}
-                      </div>
-                    </td>
-                  )}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
   const checkValueStatus = (value: string, referenceRange: string) => {
     if (!value || !referenceRange) return "normal";
@@ -642,12 +652,6 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
             background-color: #f3f4f6 !important;
             border-radius: 3px !important;
             letter-spacing: 0.5px !important;
-          }
-
-          .border.rounded-lg
-            .flex.items-center.gap-2
-            > span:not([class*="badge"]):not([class*="Badge"])::after {
-            content: " ( FBC )" !important;
           }
 
           table {
@@ -801,61 +805,6 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
             display: block !important;
           }
         }
-          /* OGTT Graph Print Styles */
-  .ogtt-section {
-    page-break-inside: avoid !important;
-  }
-
-  .ogtt-graph-wrapper {
-    page-break-inside: avoid !important;
-    display: block !important;
-    margin-top: 20px !important;
-    margin-bottom: 20px !important;
-  }
-
-  .ogtt-graph-container {
-    page-break-inside: avoid !important;
-    box-shadow: none !important;
-    border: 1px solid #e5e7eb !important;
-  }
-
-  .recharts-wrapper {
-    page-break-inside: avoid !important;
-  }
-
-  .recharts-surface {
-    page-break-inside: avoid !important;
-  }
-
-  /* Make sure graph card header prints */
-  .ogtt-graph-container [class*="CardHeader"] {
-    display: block !important;
-    background-color: #f9fafb !important;
-    padding: 12px !important;
-    border-bottom: 1px solid #e5e7eb !important;
-  }
-
-  .ogtt-graph-container [class*="CardTitle"] {
-    font-size: 14px !important;
-    font-weight: bold !important;
-    display: flex !important;
-    justify-content: space-between !important;
-    align-items: center !important;
-  }
-
-  .ogtt-graph-container [class*="CardContent"] {
-    display: block !important;
-    padding: 12px !important;
-  }
-
-  /* Interpretation box */
-  .ogtt-graph-container .bg-blue-50 {
-    background-color: #eff6ff !important;
-    border-left: 4px solid #3b82f6 !important;
-    padding: 10px !important;
-    margin-top: 12px !important;
-    page-break-inside: avoid !important;
-  }
 }
       `}</style>
       <div className="space-y-6">
@@ -880,10 +829,10 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
-            <Button variant="outline">
+            {/* <Button variant="outline">
               <Edit className="h-4 w-4 mr-2" />
               Edit
-            </Button>
+            </Button> */}
           </div>
         </div>
 
@@ -914,7 +863,7 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
           <CardContent className="space-y-3 p-3">
             <div className="bg-gray-50">
               <div className="space-y-2 border-t-2 border-black">
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2">
                   <div className="flex">
                     <span className="text-sm text-gray-600 font-bold w-32 flex-shrink-0 text-left">
                       Patient Name
@@ -932,7 +881,7 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
                     </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2">
                   <div className="flex">
                     <span className="text-sm text-gray-600 font-bold w-32 flex-shrink-0 text-left">
                       Age
@@ -950,7 +899,7 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
                     </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2">
                   <div className="flex">
                     <span className="text-sm text-gray-600 font-bold w-32 flex-shrink-0 text-left">
                       Gender
@@ -969,7 +918,7 @@ const renderRegularTestResults = (testCode: string, testResults: any[]) => {
                     </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-8">
+                <div className="grid grid-cols-2">
                   <div className="flex">
                     <span className="text-sm text-gray-600 font-bold w-32 flex-shrink-0 text-left">
                       Phone

@@ -93,16 +93,16 @@ export const OGTTGraph: React.FC<OGTTGraphProps> = ({ fasting, afterOneHour, aft
   };
 
   return (
-    <Card className="w-full ogtt-graph-container print-preserve">
-      <CardHeader>
-        <CardTitle className="flex items-center justify-between">
+    <div className="w-full ogtt-graph-container print-preserve">
+      <div>
+        <div className="flex items-center justify-between">
           <span>Oral Glucose Tolerance Test (OGTT)</span>
           <span className="text-sm font-normal px-3 py-1 rounded-full" style={{ backgroundColor: status.color, color: 'white' }}>
             {status.text}
           </span>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+        </div>
+      </div>
+      <div>
         <ResponsiveContainer width="100%" height={400}>
           <ComposedChart data={data} margin={{ top: 40, right: 30, left: 20, bottom: 30 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
@@ -172,7 +172,7 @@ export const OGTTGraph: React.FC<OGTTGraphProps> = ({ fasting, afterOneHour, aft
           </ComposedChart>
         </ResponsiveContainer>
 
-        <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm">
+        {/* <div className="mt-4 p-4 bg-blue-50 border-l-4 border-blue-500 rounded text-sm">
           <div className="font-semibold mb-2 text-blue-900">Interpretation:</div>
           <div className="text-gray-700">
             {twoHourVal < 140 && fastingVal < 100 && "✓ Normal glucose tolerance. No diabetes indicated."}
@@ -181,8 +181,8 @@ export const OGTTGraph: React.FC<OGTTGraphProps> = ({ fasting, afterOneHour, aft
             {(twoHourVal >= 200 || fastingVal >= 126) && 
               "⚠ Diabetes mellitus indicated. Further evaluation and treatment required. Please consult with physician immediately."}
           </div>
-        </div>
-      </CardContent>
-    </Card>
+        </div> */}
+      </div>
+    </div>
   );
 };
