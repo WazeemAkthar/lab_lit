@@ -253,7 +253,7 @@ export default function ReportDetailsPage() {
                 return (
                   <tr key={index} className="border-0 font-mono p-0 table-row">
                     <td className="py-0 font-mono">{displayName}</td>
-                    <td className="text-right py-0 font-mono font-bold">
+                    <td className="text-right py-0 font-mono">
                       {result.value}
                     </td>
                     <td className="text-right py-0 font-mono">{result.unit}</td>
@@ -306,13 +306,13 @@ export default function ReportDetailsPage() {
                   <div className="font-medium">{result.testName}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">{result.value}</div>
+                  <div className=" text-lg">{result.value}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">{result.unit}</div>
+                  <div className=" text-lg">{result.unit}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">
+                  <div className=" text-lg">
                     {result.referenceRange}
                   </div>
                 </td>
@@ -349,13 +349,13 @@ export default function ReportDetailsPage() {
                   <div className="font-medium">{result.testName}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">{result.value}</div>
+                  <div className=" text-lg">{result.value}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">{result.unit}</div>
+                  <div className=" text-lg">{result.unit}</div>
                 </td>
                 <td className="p-4">
-                  <div className="font-semibold text-lg">
+                  <div className=" text-lg">
                     {result.referenceRange}
                   </div>
                 </td>
@@ -604,7 +604,7 @@ export default function ReportDetailsPage() {
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="font-semibold text-lg">
+                    <div className=" text-lg">
                       {result.value}
                       {isQualitative && result.comments && (
                         <span className="ml-2">({result.comments})</span>
@@ -612,11 +612,11 @@ export default function ReportDetailsPage() {
                     </div>
                   </td>
                   <td className="p-4">
-                    <div className="font-semibold text-lg">{result.unit}</div>
+                    <div className=" text-lg">{result.unit}</div>
                   </td>
                   {!hideReferenceRange && (
                     <td className="p-4">
-                      <div className="font-semibold text-lg">
+                      <div className=" text-lg">
                         {result.referenceRange}
                       </div>
                     </td>
@@ -800,8 +800,7 @@ export default function ReportDetailsPage() {
           th:nth-child(2),
           td:nth-child(2) {
             text-align: center !important;
-            width: 15%;
-            font-weight: bold !important;
+            width: 15%;        
             padding: 0px !important;
           }
           th:nth-child(3),

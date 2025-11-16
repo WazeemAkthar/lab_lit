@@ -60,6 +60,7 @@ export interface ReportResult {
   unit: string;
   referenceRange: string;
   comments?: string;
+  isQualitative?: boolean;
 }
 
 export interface Report {

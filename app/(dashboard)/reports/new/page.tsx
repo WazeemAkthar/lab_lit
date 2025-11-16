@@ -131,6 +131,7 @@ export default function NewReportPage() {
   const [ogttValues, setOgttValues] = useState<any>(null);
   const [ppbsValues, setPpbsValues] = useState<any>(null);
   const [bssValues, setBssValues] = useState<any[]>([]);
+  const [testCatalog, setTestCatalog] = useState<any[]>([]);
 
   const hasUFRTest = useDirectTestSelection
     ? selectedTests.includes("UFR")
@@ -164,12 +165,13 @@ export default function NewReportPage() {
       router.push("/");
       return;
     }
-
     // Load data
     async function loadData() {
       const dataManager = DataManager.getInstance();
       const patientsData = await dataManager.getPatients();
       const invoicesData = await dataManager.getInvoices();
+      const catalogData = await dataManager.getTestCatalog();
+      setTestCatalog(catalogData);
       setPatients(patientsData);
       setInvoices(invoicesData);
       setLoading(false);
@@ -212,7 +214,7 @@ export default function NewReportPage() {
 
       invoice.lineItems.forEach((item) => {
         const test = testCatalog.find((t) => t.code === item.testCode);
-        const referenceRanges = test?.referenceRange || {};
+  const referenceRanges = test?.referenceRange || {};
 
         // Handle FBC, LIPID, UFR, OGTT specially - don't create individual result entries
         if (
@@ -239,6 +241,7 @@ export default function NewReportPage() {
       unit: componentUnit, // Use component-specific unit
       referenceRange: String(range),
       comments: "",
+      isQualitative: test?.isQualitative || false,
     });
   });
 } else {
@@ -338,10 +341,10 @@ export default function NewReportPage() {
       const test = testCatalog.find((t) => t.code === testCode);
       const referenceRanges = test?.referenceRange || {};
 
-      // Handle FBC, LIPID, UFR, OGTT specially - don't create individual result entries
-      if (testCode === "FBC" || testCode === "LIPID" || testCode === "UFR" || testCode === "OGTT" || testCode === "PPBS") {
-        return;
-      }
+// Handle FBC, LIPID, UFR, OGTT, PPBS, BSS specially - don't create individual result entries
+if (testCode === "FBC" || testCode === "LIPID" || testCode === "UFR" || testCode === "OGTT" || testCode === "PPBS" || testCode === "BSS") {
+  return;
+}
 
      // For multi-component tests, create separate result entries for each component
 if (Object.keys(referenceRanges).length > 1) {
@@ -768,7 +771,7 @@ const handleSubmit = async (e: React.FormEvent) => {
       allResults.push(...ufrResults);
     }
 
-  // Add OGTT results if available
+ // Add OGTT results if available
 if (ogttValues && hasOGTTTest) {
   console.log("=== SAVING OGTT DATA ===");
   console.log("ogttValues:", ogttValues);
@@ -807,8 +810,16 @@ if (ogttValues && hasOGTTTest) {
       comments: "",
     });
   }
-  // Add PPBS results if available
+  
+  console.log("OGTT results to save:", ogttResultsArray);
+  allResults.push(...ogttResultsArray);
+}
+
+// Add PPBS results if available (MOVED OUTSIDE OF OGTT BLOCK)
 if (ppbsValues && hasPPBSTest && ppbsValues.value && ppbsValues.value.trim() !== "") {
+  console.log("=== SAVING PPBS DATA ===");
+  console.log("ppbsValues:", ppbsValues);
+  
   const referenceRange = ppbsValues.hourType === "After 1 Hour" ? "< 160" : "< 140";
   
   allResults.push({
@@ -819,10 +830,15 @@ if (ppbsValues && hasPPBSTest && ppbsValues.value && ppbsValues.value.trim() !==
     referenceRange: referenceRange,
     comments: "",
   });
+  
+  console.log("PPBS result added to allResults");
 }
 
-// Add BSS results if available
+// Add BSS results if available (MOVED OUTSIDE OF OGTT BLOCK)
 if (bssValues && hasBSSTest && bssValues.length > 0) {
+  console.log("=== SAVING BSS DATA ===");
+  console.log("bssValues:", bssValues);
+  
   bssValues.forEach((entry) => {
     if (entry.value && entry.value.trim() !== "") {
       const referenceRange = entry.hourType === "After 1 Hour" ? "< 160" : "< 140";
@@ -837,11 +853,8 @@ if (bssValues && hasBSSTest && bssValues.length > 0) {
       });
     }
   });
-}
   
-  console.log("OGTT results to save:", ogttResultsArray);
-
-  allResults.push(...ogttResultsArray);
+  console.log("BSS results added to allResults");
 }
 
     if (allResults.length === 0) {
@@ -1100,11 +1113,13 @@ const hasPPBSResults =
         </Card>
 
         {/* Test Results */}
-        {(results.length > 0 ||
-          hasFBCTest ||
-          hasLipidProfileTest ||
-          hasUFRTest ||
-          hasOGTTTest) && (
+{(results.length > 0 ||
+  hasFBCTest ||
+  hasLipidProfileTest ||
+  hasUFRTest ||
+  hasOGTTTest ||
+  hasPPBSTest ||
+  hasBSSTest) && (
           <div className="space-y-6">
             {/* FBC Test - Special Component */}
             {hasFBCTest && (
@@ -1209,9 +1224,8 @@ const hasPPBSResults =
                 <CardContent className="space-y-6">
                   {results.map((result, index) => {
                     const dataManager = DataManager.getInstance();
-                    const isQualitative =
-                      dataManager.getTestByCode(result.testCode)
-                        ?.isQualitative || false;
+                    const testDetails = testCatalog.find(t => t.code === result.testCode);
+const isQualitative = testDetails?.isQualitative || false;
 
                     return (
                       <div
@@ -1353,12 +1367,14 @@ const hasPPBSResults =
           </div>
         )}
 
-        {/* Doctor's Remarks */}
-        {(results.length > 0 ||
-          hasFBCTest ||
-          hasLipidProfileTest ||
-          hasUFRTest ||
-          hasOGTTTest) && (
+{/* Doctor's Remarks */}
+{(results.length > 0 ||
+  hasFBCTest ||
+  hasLipidProfileTest ||
+  hasUFRTest ||
+  hasOGTTTest ||
+  hasPPBSTest ||
+  hasBSSTest) && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
