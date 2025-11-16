@@ -847,54 +847,51 @@ export default function NewReportPage() {
         allResults.push(...ogttResultsArray);
       }
 
-      // Add PPBS results if available (MOVED OUTSIDE OF OGTT BLOCK)
-      if (
-        ppbsValues &&
-        hasPPBSTest &&
-        ppbsValues.value &&
-        ppbsValues.value.trim() !== ""
-      ) {
-        console.log("=== SAVING PPBS DATA ===");
-        console.log("ppbsValues:", ppbsValues);
-
-        const referenceRange =
-          ppbsValues.hourType === "After 1 Hour" ? "< 160" : "< 140";
-
-        allResults.push({
-          testCode: "PPBS",
-          testName: `Post Prandial Blood Sugar (${ppbsValues.mealType} / ${ppbsValues.hourType})`,
-          value: ppbsValues.value,
-          unit: "mg/dL",
-          referenceRange: referenceRange,
-          comments: "",
-        });
-
-        console.log("PPBS result added to allResults");
-      }
+// Add PPBS results if available (MOVED OUTSIDE OF OGTT BLOCK)
+if (ppbsValues && hasPPBSTest && ppbsValues.value && ppbsValues.value.trim() !== "") {
+  console.log("=== SAVING PPBS DATA ===");
+  console.log("ppbsValues:", ppbsValues);
+  
+  const referenceRange = ppbsValues.hourType === "After 1 Hour" ? "< 160" : "< 140";
+  
+  allResults.push({
+    testCode: "PPBS",
+    testName: "Post Prandial Blood Sugar",
+    value: ppbsValues.value,
+    unit: "mg/dL",
+    referenceRange: referenceRange,
+    comments: "",
+    mealType: ppbsValues.mealType,      // Store meal type separately
+    hourType: ppbsValues.hourType,      // Store hour type separately
+  });
+  
+  console.log("PPBS result added to allResults");
+}
 
       // Add BSS results if available (MOVED OUTSIDE OF OGTT BLOCK)
-      if (bssValues && hasBSSTest && bssValues.length > 0) {
-        console.log("=== SAVING BSS DATA ===");
-        console.log("bssValues:", bssValues);
-
-        bssValues.forEach((entry) => {
-          if (entry.value && entry.value.trim() !== "") {
-            const referenceRange =
-              entry.hourType === "After 1 Hour" ? "< 160" : "< 140";
-
-            allResults.push({
-              testCode: "BSS",
-              testName: `Post Prandial Blood Sugar (${entry.mealType} / ${entry.hourType})`,
-              value: entry.value,
-              unit: "mg/dL",
-              referenceRange: referenceRange,
-              comments: "",
-            });
-          }
-        });
-
-        console.log("BSS results added to allResults");
-      }
+if (bssValues && hasBSSTest && bssValues.length > 0) {
+  console.log("=== SAVING BSS DATA ===");
+  console.log("bssValues:", bssValues);
+  
+  bssValues.forEach((entry) => {
+    if (entry.value && entry.value.trim() !== "") {
+      const referenceRange = entry.hourType === "After 1 Hour" ? "< 160" : "< 140";
+      
+      allResults.push({
+        testCode: "BSS",
+        testName: "Post Prandial Blood Sugar",
+        value: entry.value,
+        unit: "mg/dL",
+        referenceRange: referenceRange,
+        comments: "",
+        mealType: entry.mealType,      // Store meal type separately
+        hourType: entry.hourType,      // Store hour type separately
+      });
+    }
+  });
+  
+  console.log("BSS results added to allResults");
+}
 
       if (allResults.length === 0) {
         console.error("No results to save!");

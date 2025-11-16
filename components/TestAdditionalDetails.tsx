@@ -18,117 +18,74 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
         return {
           title: "Recommended and High-Risk Plasma Lipid Concentrations",
           content: (
-            <div className="space-y-4">
-              {/* Info Text */}
-              <div>
-                <p className="text-sm mb-4 font-medium">
-                  Recommended and high-risk plasma lipid concentrations with
-                  desirable, borderline, and high levels.
-                </p>
-              </div>
+       <div className="space-y-4 font-mono tracking-wide text-sm">
+  {/* Header Title */}
+  <p className="font-semibold underline underline-offset-4">
+    RECOMMENDED AND HIGH RISK PLASMA LIPID CONCENTRATIONS
+  </p>
 
-              {/* Table */}
-              <div className="overflow-x-auto">
-                <table className="w-full border-collapse border border-gray-300 text-sm">
-                  <thead>
-                    <tr className="bg-gray-50">
-                      <th className="border border-gray-300 p-2 text-left font-semibold">
-                        Chemistry
-                      </th>
-                      <th className="border border-gray-300 p-2 text-center font-semibold">
-                        Desirable Levels
-                      </th>
-                      <th className="border border-gray-300 p-2 text-center font-semibold">
-                        Borderline Levels
-                      </th>
-                      <th className="border border-gray-300 p-2 text-center font-semibold">
-                        High Levels
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-medium">
-                        Total Cholesterol
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &lt; 200 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        200 – 235 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &gt; 235 mg/dl
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-medium">
-                        HDL Cholesterol
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        ≥ 45 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        35 – 45 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &lt; 35 mg/dl
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-medium">
-                        Triglycerides
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &lt; 150 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        150 – 200 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &gt; 200 mg/dl
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-medium">
-                        LDL Cholesterol
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &lt; 150 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        150 – 190 mg/dl
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &gt; 190 mg/dl
-                      </td>
-                    </tr>
-                    <tr>
-                      <td className="border border-gray-300 p-2 font-medium">
-                        Total Cholesterol / HDL
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &lt; 3.5
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        3.5 – 6.0
-                      </td>
-                      <td className="border border-gray-300 p-2 text-center">
-                        &gt; 6.0
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
+  {/* Spacing */}
+  <div className="h-2"></div>
 
-              {/* Note Section */}
-              <div className="mt-4 p-3 bg-green-50 border-l-4 border-green-400">
-                <p className="text-xs font-medium">
-                  Fully automated Biochemistry Analyzer –{" "}
-                  <strong>SELECTRA ProM</strong>
-                </p>
-              </div>
-            </div>
+  {/* Table */}
+  <div className="overflow-x-auto">
+    <table className="w-full text-sm">
+      <thead>
+        <tr>
+          <th className="p-2 text-left font-semibold underline">CHEMISTRY</th>
+          <th className="p-2 text-center font-semibold underline">DESIRABLE LEVELS</th>
+          <th className="p-2 text-center font-semibold underline">BORDERLINE LEVELS</th>
+          <th className="p-2 text-center font-semibold underline">HIGH LEVELS</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr>
+          <td className="p-2">Total Cholesterol</td>
+          <td className="p-2 text-center">&lt; 200 mg/dl</td>
+          <td className="p-2 text-center">200 – 235 mg/dl</td>
+          <td className="p-2 text-center">&gt; 235 mg/dl</td>
+        </tr>
+
+        <tr>
+          <td className="p-2">HDL Cholesterol</td>
+          <td className="p-2 text-center">≥ 45 mg/dl</td>
+          <td className="p-2 text-center">35 – 45 mg/dl</td>
+          <td className="p-2 text-center">&lt; 35 mg/dl</td>
+        </tr>
+
+        <tr>
+          <td className="p-2">Triglycerides</td>
+          <td className="p-2 text-center">&lt; 150 mg/dl</td>
+          <td className="p-2 text-center">150 – 200 mg/dl</td>
+          <td className="p-2 text-center">&gt; 200 mg/dl</td>
+        </tr>
+
+        <tr>
+          <td className="p-2">LDL Cholesterol</td>
+          <td className="p-2 text-center">&lt; 150 mg/dl</td>
+          <td className="p-2 text-center">150 – 190 mg/dl</td>
+          <td className="p-2 text-center">&gt; 190 mg/dl</td>
+        </tr>
+
+        <tr>
+          <td className="p-2">Total Cholesterol / HDL</td>
+          <td className="p-2 text-center">&lt; 3.5</td>
+          <td className="p-2 text-center">3.5 – 6.0</td>
+          <td className="p-2 text-center">&gt; 6.0</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  {/* Footer Note */}
+  <div className="mt-4">
+    <p className="text-xs">
+      ❖ Fully automated Bio chemistry analyzer – <strong>SELECTRA ProM</strong>
+    </p>
+  </div>
+</div>
+
           ),
         };
 
@@ -245,7 +202,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         &lt; 3 Days
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.68 – 29.0
+                        0.68 – 29.0 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -253,7 +210,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         4 – 30 Days
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.51 – 11.0
+                        0.51 – 11.0 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -261,7 +218,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         1 – 12 Months
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.55 – 6.7
+                        0.55 – 6.7 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -269,7 +226,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         1 – 6 Years
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.45 – 6.0
+                        0.45 – 6.0 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -277,7 +234,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         6 – 12 Years
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.61 – 5.2
+                        0.61 – 5.2 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -285,13 +242,13 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         12 – 16 Years
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.36 – 4.7
+                        0.36 – 4.7 µIU/ml
                       </td>
                     </tr>
                     <tr>
                       <td className="border border-gray-300 p-2">Adults</td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.27 – 4.2
+                        0.27 – 4.2 µIU/ml
                       </td>
                     </tr>
 
@@ -309,7 +266,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         1st Trimester
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.33 – 4.59
+                        0.33 – 4.59 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -317,7 +274,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         2nd Trimester
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.35 – 4.10
+                        0.35 – 4.10 µIU/ml
                       </td>
                     </tr>
                     <tr>
@@ -325,7 +282,7 @@ const TestAdditionalDetails: React.FC<TestAdditionalDetailsProps> = ({
                         3rd Trimester
                       </td>
                       <td className="border border-gray-300 p-2 text-center">
-                        0.21 – 3.15
+                        0.21 – 3.15 µIU/ml
                       </td>
                     </tr>
                   </tbody>
