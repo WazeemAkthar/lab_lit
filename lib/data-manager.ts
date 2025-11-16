@@ -61,6 +61,8 @@ export interface ReportResult {
   referenceRange: string;
   comments?: string;
   isQualitative?: boolean;
+  mealType?: string;   
+  hourType?: string;   
 }
 
 export interface Report {
@@ -702,7 +704,38 @@ export class DataManager {
   },
   category: "Glucose",
   hasMultipleMealOptions: true,
+},
+{
+  code: "LP",
+  name: "Liver Profile",
+  defaultPrice: 1800.0,          // You may adjust
+  estimatedCost: 600.0,          // You may adjust
+  unit: "per test",
+  referenceRange: {
+    "Total Protein": "6.2 - 8.5 g/dl",
+    "Albumin": "2.5 - 6.0 g/dl",
+    "Globulin": "1.2 - 3.3 g/dl",
+    "Albumin / Globulin Ratio": "1.2 - 3.3",
+    "Bilirubin Total": "0.1 - 1.2 mg/dl",
+    "Alkaline Phosphatase": "35.0 - 173.0 IU/l",
+    "SGOT / AST": "5.0 - 40.0 IU/l",
+    "SGPT / ALT": "4.0 - 42.0 IU/l",
+    "Gamma GT": "10.0 - 50.0 IU/l"
+  },
+  unitPerTest: {
+    "Total Protein": "g/dl",
+    "Albumin": "g/dl",
+    "Globulin": "g/dl",
+    "Albumin / Globulin Ratio": "",
+    "Bilirubin Total": "mg/dl",
+    "Alkaline Phosphatase": "IU/l",
+    "SGOT / AST": "IU/l",
+    "SGPT / ALT": "IU/l",
+    "Gamma GT": "IU/l"
+  },
+  category: "Biochemistry"
 }
+
     ];
   }
 

@@ -233,51 +233,52 @@ export default function NewReportPage() {
       const initialResults: ReportResult[] = [];
 
       invoice.lineItems.forEach((item) => {
-        const test = testCatalog.find((t) => t.code === item.testCode);
-        const referenceRanges = test?.referenceRange || {};
+  const test = testCatalog.find((t) => t.code === item.testCode);
+  const referenceRanges = test?.referenceRange || {};
 
-        // Handle FBC, LIPID, UFR, OGTT specially - don't create individual result entries
-        if (
-          item.testCode === "FBC" ||
-          item.testCode === "LIPID" ||
-          item.testCode === "UFR" ||
-          item.testCode === "OGTT" ||
-          item.testCode === "PPBS" ||
-          item.testCode === "BSS"
-        ) {
-          return;
-        }
+  // Handle FBC, LIPID, UFR, OGTT, PPBS, BSS specially - don't create individual result entries
+  if (
+    item.testCode === "FBC" ||
+    item.testCode === "LIPID" ||
+    item.testCode === "UFR" ||
+    item.testCode === "OGTT" ||
+    item.testCode === "PPBS" ||
+    item.testCode === "BSS"
+  ) {
+    return;
+  }
 
-        // For multi-component tests, create separate result entries for each component
-        if (Object.keys(referenceRanges).length > 1) {
-          Object.entries(referenceRanges).forEach(([component, range]) => {
-            // NEW: Get component-specific unit
-            const componentUnit =
-              test?.unitPerTest?.[component] || test?.unit || "";
+  // For multi-component tests, create separate result entries for each component
+  if (Object.keys(referenceRanges).length > 1) {
+    Object.entries(referenceRanges).forEach(([component, range]) => {
+      const componentUnit =
+        test?.unitPerTest?.[component] || test?.unit || "";
 
-            initialResults.push({
-              testCode: item.testCode,
-              testName: `${item.testName} - ${component}`,
-              value: "",
-              unit: componentUnit, // Use component-specific unit
-              referenceRange: String(range),
-              comments: "",
-              isQualitative: test?.isQualitative || false,
-            });
-          });
-        } else {
-          // For single-component tests
-          const firstRange = Object.entries(referenceRanges)[0];
-          initialResults.push({
-            testCode: item.testCode,
-            testName: item.testName,
-            value: "",
-            unit: test?.unit || "", // Use unit from test catalog
-            referenceRange: firstRange ? String(firstRange[1]) : "",
-            comments: "",
-          });
-        }
+      initialResults.push({
+        testCode: item.testCode,
+        testName: component, // ✅ USE ONLY THE COMPONENT NAME
+        value: "",
+        unit: componentUnit,
+        referenceRange: String(range),
+        comments: "",
+        isQualitative: test?.isQualitative || false,
       });
+    });
+  } else {
+    // For single-component tests - use the reference range key
+    const firstRange = Object.entries(referenceRanges)[0];
+    const componentName = firstRange ? firstRange[0] : item.testName;
+    
+    initialResults.push({
+      testCode: item.testCode,
+      testName: componentName, // ✅ USE THE REFERENCE RANGE KEY
+      value: "",
+      unit: test?.unit || "",
+      referenceRange: firstRange ? String(firstRange[1]) : "",
+      comments: "",
+    });
+  }
+});
 
       setResults(initialResults);
     }
@@ -359,50 +360,63 @@ export default function NewReportPage() {
     const initialResults: ReportResult[] = [];
 
     testCodes.forEach((testCode) => {
-      const test = testCatalog.find((t) => t.code === testCode);
-      const referenceRanges = test?.referenceRange || {};
+  const test = testCatalog.find((t) => t.code === testCode);
+  const referenceRanges = test?.referenceRange || {};
 
-      // Handle FBC, LIPID, UFR, OGTT, PPBS, BSS specially - don't create individual result entries
-      if (
-        testCode === "FBC" ||
-        testCode === "LIPID" ||
-        testCode === "UFR" ||
-        testCode === "OGTT" ||
-        testCode === "PPBS" ||
-        testCode === "BSS"
-      ) {
-        return;
-      }
+  // Handle FBC, LIPID, UFR, OGTT, PPBS, BSS specially - don't create individual result entries
+  if (
+    testCode === "FBC" ||
+    testCode === "LIPID" ||
+    testCode === "UFR" ||
+    testCode === "OGTT" ||
+    testCode === "PPBS" ||
+    testCode === "BSS"
+  ) {
+    return;
+  }
 
-      // For multi-component tests, create separate result entries for each component
-      if (Object.keys(referenceRanges).length > 1) {
-        Object.entries(referenceRanges).forEach(([component, range]) => {
-          // NEW: Get component-specific unit
-          const componentUnit =
-            test?.unitPerTest?.[component] || test?.unit || "";
+  // For multi-component tests, create separate result entries for each component
+  if (Object.keys(referenceRanges).length > 1) {
+    Object.entries(referenceRanges).forEach(([component, range]) => {
+      const componentUnit =
+        test?.unitPerTest?.[component] || test?.unit || "";
 
-          initialResults.push({
-            testCode: testCode,
-            testName: `${test?.name} - ${component}`,
-            value: "",
-            unit: componentUnit, // Use component-specific unit
-            referenceRange: String(range),
-            comments: "",
-          });
-        });
-      } else {
-        // For single-component tests
-        const firstRange = Object.entries(referenceRanges)[0];
-        initialResults.push({
-          testCode: testCode,
-          testName: test?.name || testCode,
-          value: "",
-          unit: test?.unit || "", // Use unit from test catalog
-          referenceRange: firstRange ? String(firstRange[1]) : "",
-          comments: "",
-        });
-      }
+      initialResults.push({
+        testCode: testCode,
+        testName: component, // ✅ USE ONLY THE COMPONENT NAME
+        value: "",
+        unit: componentUnit,
+        referenceRange: String(range),
+        comments: "",
+      });
     });
+  } else {
+    // For single-component tests - use the reference range key
+    const firstRange = Object.entries(referenceRanges)[0];
+const componentName = firstRange ? firstRange[0] : (test?.name || testCode);
+
+// Handle nested reference ranges (like Man/Woman for Haemoglobin)
+let referenceRangeValue = "";
+if (firstRange) {
+  const rangeValue = firstRange[1];
+  if (typeof rangeValue === 'object' && rangeValue !== null) {
+    // Store as JSON string for nested objects
+    referenceRangeValue = JSON.stringify(rangeValue);
+  } else {
+    referenceRangeValue = String(rangeValue);
+  }
+}
+
+initialResults.push({
+  testCode: testCode,  // ✅ Changed from item.testCode to testCode
+  testName: componentName,
+  value: "",
+  unit: test?.unit || "",
+  referenceRange: referenceRangeValue,
+  comments: "",
+});
+  }
+});
 
     setResults(initialResults);
   };
@@ -847,54 +861,51 @@ export default function NewReportPage() {
         allResults.push(...ogttResultsArray);
       }
 
-      // Add PPBS results if available (MOVED OUTSIDE OF OGTT BLOCK)
-      if (
-        ppbsValues &&
-        hasPPBSTest &&
-        ppbsValues.value &&
-        ppbsValues.value.trim() !== ""
-      ) {
-        console.log("=== SAVING PPBS DATA ===");
-        console.log("ppbsValues:", ppbsValues);
-
-        const referenceRange =
-          ppbsValues.hourType === "After 1 Hour" ? "< 160" : "< 140";
-
-        allResults.push({
-          testCode: "PPBS",
-          testName: `Post Prandial Blood Sugar (${ppbsValues.mealType} / ${ppbsValues.hourType})`,
-          value: ppbsValues.value,
-          unit: "mg/dL",
-          referenceRange: referenceRange,
-          comments: "",
-        });
-
-        console.log("PPBS result added to allResults");
-      }
+// Add PPBS results if available (MOVED OUTSIDE OF OGTT BLOCK)
+if (ppbsValues && hasPPBSTest && ppbsValues.value && ppbsValues.value.trim() !== "") {
+  console.log("=== SAVING PPBS DATA ===");
+  console.log("ppbsValues:", ppbsValues);
+  
+  const referenceRange = ppbsValues.hourType === "After 1 Hour" ? "< 160" : "< 140";
+  
+  allResults.push({
+    testCode: "PPBS",
+    testName: "Post Prandial Blood Sugar",
+    value: ppbsValues.value,
+    unit: "mg/dL",
+    referenceRange: referenceRange,
+    comments: "",
+    mealType: ppbsValues.mealType,      // Store meal type separately
+    hourType: ppbsValues.hourType,      // Store hour type separately
+  });
+  
+  console.log("PPBS result added to allResults");
+}
 
       // Add BSS results if available (MOVED OUTSIDE OF OGTT BLOCK)
-      if (bssValues && hasBSSTest && bssValues.length > 0) {
-        console.log("=== SAVING BSS DATA ===");
-        console.log("bssValues:", bssValues);
-
-        bssValues.forEach((entry) => {
-          if (entry.value && entry.value.trim() !== "") {
-            const referenceRange =
-              entry.hourType === "After 1 Hour" ? "< 160" : "< 140";
-
-            allResults.push({
-              testCode: "BSS",
-              testName: `Post Prandial Blood Sugar (${entry.mealType} / ${entry.hourType})`,
-              value: entry.value,
-              unit: "mg/dL",
-              referenceRange: referenceRange,
-              comments: "",
-            });
-          }
-        });
-
-        console.log("BSS results added to allResults");
-      }
+if (bssValues && hasBSSTest && bssValues.length > 0) {
+  console.log("=== SAVING BSS DATA ===");
+  console.log("bssValues:", bssValues);
+  
+  bssValues.forEach((entry) => {
+    if (entry.value && entry.value.trim() !== "") {
+      const referenceRange = entry.hourType === "After 1 Hour" ? "< 160" : "< 140";
+      
+      allResults.push({
+        testCode: "BSS",
+        testName: "Post Prandial Blood Sugar",
+        value: entry.value,
+        unit: "mg/dL",
+        referenceRange: referenceRange,
+        comments: "",
+        mealType: entry.mealType,      // Store meal type separately
+        hourType: entry.hourType,      // Store hour type separately
+      });
+    }
+  });
+  
+  console.log("BSS results added to allResults");
+}
 
       if (allResults.length === 0) {
         console.error("No results to save!");
@@ -1362,24 +1373,56 @@ export default function NewReportPage() {
                           </div>
 
                           <div className="space-y-2">
-                            <Label
-                              htmlFor={`range-${result.testCode}-${result.testName}-${index}`}
-                            >
-                              Reference Range
-                            </Label>
-                            <Input
-                              id={`range-${result.testCode}-${result.testName}-${index}`}
-                              value={result.referenceRange}
-                              onChange={(e) =>
-                                updateResult(
-                                  result.testName,
-                                  "referenceRange",
-                                  e.target.value
-                                )
-                              }
-                              placeholder={`e.g. ${result.referenceRange}`}
-                            />
-                          </div>
+  <Label
+    htmlFor={`range-${result.testCode}-${result.testName}-${index}`}
+  >
+    Reference Range
+  </Label>
+  <Input
+    id={`range-${result.testCode}-${result.testName}-${index}`}
+    value={(() => {
+      // Format nested reference ranges for display
+      try {
+        const parsed = typeof result.referenceRange === 'string' 
+          ? JSON.parse(result.referenceRange) 
+          : result.referenceRange;
+        
+        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+          return Object.entries(parsed)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(', ');
+        }
+        return result.referenceRange;
+      } catch {
+        return result.referenceRange;
+      }
+    })()}
+    onChange={(e) =>
+      updateResult(
+        result.testName,
+        "referenceRange",
+        e.target.value
+      )
+    }
+    placeholder={(() => {
+      // Format nested reference ranges for placeholder
+      try {
+        const parsed = typeof result.referenceRange === 'string' 
+          ? JSON.parse(result.referenceRange) 
+          : result.referenceRange;
+        
+        if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+          return Object.entries(parsed)
+            .map(([key, value]) => `${key}: ${value}`)
+            .join(', ');
+        }
+        return `e.g. ${result.referenceRange}`;
+      } catch {
+        return `e.g. ${result.referenceRange}`;
+      }
+    })()}
+  />
+</div>
                         </div>
 
                         {!isQualitative && (

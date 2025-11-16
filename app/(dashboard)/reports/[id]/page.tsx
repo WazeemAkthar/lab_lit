@@ -278,91 +278,97 @@ export default function ReportDetailsPage() {
     );
   };
 
-  const renderPPBSResults = (ppbsResults: any[]) => {
-    console.log("=== RENDERING PPBS RESULTS ===");
-    console.log("PPBS Results:", ppbsResults);
+const renderPPBSResults = (ppbsResults: any[]) => {
+  console.log("=== RENDERING PPBS RESULTS ===");
+  console.log("PPBS Results:", ppbsResults);
 
-    return (
-      <div key="PPBS" className="border rounded-lg p-6">
-        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-          Post Prandial Blood Sugar
-        </h1>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Description</th>
-              <th className="text-left p-4">Result</th>
-              <th className="text-left p-4">Units</th>
-              <th className="text-left p-4">Reference Range</th>
-            </tr>
-          </thead>
-          <tbody>
-            {ppbsResults.map((result, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-4">
-                  <div className="font-medium">{result.testName}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">{result.value}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">{result.unit}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">
-                    {result.referenceRange}
+  return (
+    <div key="PPBS" className="border rounded-lg p-6">
+      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+        Post Prandial Blood Sugar
+      </h1>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left p-4">Description</th>
+            <th className="text-left p-4">Result</th>
+            <th className="text-left p-4">Units</th>
+            <th className="text-left p-4">Reference Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ppbsResults.map((result, index) => (
+            <tr key={index} className="border-b">
+              <td className="p-4">
+                <div className="font-medium">{result.testName}</div>
+                {result.mealType && result.hourType && (
+                  <div className="text-md mt-1">
+                    ({result.mealType} / {result.hourType})
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
-
-  const renderBSSResults = (bssResults: any[]) => {
-    console.log("=== RENDERING BSS RESULTS ===");
-    console.log("BSS Results:", bssResults);
-
-    return (
-      <div key="BSS" className="border rounded-lg p-6">
-        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-          Blood for BSS
-        </h1>
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left p-4">Description</th>
-              <th className="text-left p-4">Result</th>
-              <th className="text-left p-4">Units</th>
-              <th className="text-left p-4">Reference Range</th>
+                )}
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.value}</div>
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.unit}</div>
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.referenceRange}</div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            {bssResults.map((result, index) => (
-              <tr key={index} className="border-b">
-                <td className="p-4">
-                  <div className="font-medium">{result.testName}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">{result.value}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">{result.unit}</div>
-                </td>
-                <td className="p-4">
-                  <div className=" text-lg">
-                    {result.referenceRange}
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+const renderBSSResults = (bssResults: any[]) => {
+  console.log("=== RENDERING BSS RESULTS ===");
+  console.log("BSS Results:", bssResults);
+
+  return (
+    <div key="BSS" className="border rounded-lg p-6">
+      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+        Blood for BSS
+      </h1>
+      <table className="w-full border-collapse">
+        <thead>
+          <tr className="border-b">
+            <th className="text-left p-4">Description</th>
+            <th className="text-left p-4">Result</th>
+            <th className="text-left p-4">Units</th>
+            <th className="text-left p-4">Reference Range</th>
+          </tr>
+        </thead>
+        <tbody>
+          {bssResults.map((result, index) => (
+            <tr key={index} className="border-b">
+              <td className="p-4">
+                <div className="font-medium">{result.testName}</div>
+                {result.mealType && result.hourType && (
+                  <div className="text-md mt-1">
+                    ({result.mealType} / {result.hourType})
                   </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    );
-  };
+                )}
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.value}</div>
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.unit}</div>
+              </td>
+              <td className="p-4">
+                <div className="text-lg">{result.referenceRange}</div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 
   const renderFBCResults = (fbcResults: any[]) => {
     const mainParams = fbcResults.filter((result) =>
@@ -570,8 +576,12 @@ export default function ReportDetailsPage() {
     const isBUN = testCode === "BUN";
      const isVDRL = testCode === "VDRL";
      const isHIV = testCode === "HIV";
-    const hideReferenceRange = isESR || isTSH || isHBA1C || isBUN || isVDRL || isHIV;
-    const hideunits = isHIV;
+     const isHCG = testCode === "HCG";
+     const isDEN = testCode === "DEN";
+     const isFT3 = testCode === "FT3";
+     const isFER = testCode === "FER";
+    const hideReferenceRange = isESR || isTSH || isHBA1C || isBUN || isVDRL || isHIV || isHCG || isDEN || isFT3 || isFER;
+    const hideunits = isHIV || isHCG || isDEN;
 
     return (
       <div key={testCode}>
@@ -593,9 +603,7 @@ export default function ReportDetailsPage() {
   {testResults.map((result, index) => {
     const isQualitative = testConfig?.isQualitative || false;
 
-    const displayName = result.testName.includes(" - ")
-      ? result.testName.split(" - ")[1]
-      : result.testName;
+    const displayName = result.testName;
     return (
       <tr key={`${testCode}-${index}`} className="border-b">
         <td className="p-4">
@@ -605,7 +613,7 @@ export default function ReportDetailsPage() {
         </td>
         <td className="p-4">
           <div className="text-lg">
-            {isVDRL || isHIV ? (
+            {isVDRL || isHIV || isHCG || isDEN ? (
               // For VDRL, show only the comments (Reactive/Non-Reactive)
               <span className="font-semibold">{result.comments}</span>
             ) : (
@@ -624,12 +632,29 @@ export default function ReportDetailsPage() {
           </td>
         )}
         {!hideReferenceRange && (
-          <td className="p-4">
-            <div className="text-lg">
-              {result.referenceRange}
-            </div>
-          </td>
-        )}
+  <td className="p-4">
+    <div className="text-lg">
+      {(() => {
+        // Check if referenceRange is an object with nested values (like Man/Woman)
+        try {
+          const parsed = typeof result.referenceRange === 'string' 
+            ? JSON.parse(result.referenceRange) 
+            : result.referenceRange;
+          
+          if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+            // Format nested reference ranges (e.g., Man: 13.0-18.0, Woman: 11.0-16.5)
+            return Object.entries(parsed)
+              .map(([key, value]) => `${key}: ${value}`)
+              .join(', ');
+          }
+          return result.referenceRange;
+        } catch {
+          return result.referenceRange;
+        }
+      })()}
+    </div>
+  </td>
+)}
       </tr>
     );
   })}
@@ -1071,11 +1096,11 @@ export default function ReportDetailsPage() {
     const uniqueTestCodes = [...new Set(report.results.map(r => r.testCode))];
     const shouldShowAdditionalDetails = 
       uniqueTestCodes.length === 1 && 
-      !['FBC', 'UFR', 'OGTT', 'PPBS', 'BSS', 'LIPID'].includes(uniqueTestCodes[0]);
+      !['FBC', 'UFR', 'OGTT', 'PPBS', 'BSS'].includes(uniqueTestCodes[0]);
     
     return shouldShowAdditionalDetails ? (
       <div className="mt-8">
-        <TestAdditionalDetails testCode={uniqueTestCodes[0]} />
+        <TestAdditionalDetails testCode={uniqueTestCodes[0].toLowerCase()} />
       </div>
     ) : null;
   })()}
