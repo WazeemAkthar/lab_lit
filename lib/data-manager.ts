@@ -29,6 +29,7 @@ export interface TestCatalogItem {
   unitPerTest?: Record<string, string>;
   hasGraph?: boolean;
   hasMealOptions?: boolean;
+  hasMultipleMealOptions?: boolean;
 }
 
 export interface InvoiceLineItem {
@@ -59,6 +60,7 @@ export interface ReportResult {
   unit: string;
   referenceRange: string;
   comments?: string;
+  isQualitative?: boolean;
 }
 
 export interface Report {
@@ -449,18 +451,6 @@ export class DataManager {
         category: "Biochemistry",
       },
       {
-        code: "BSS",
-        name: "Blood for BSS",
-        defaultPrice: 450.0,
-        estimatedCost: 135.0,
-        unit: "mg/dL",
-        referenceRange: {
-          "Post Prandial Blood Sugar (Post Breakfast / Post Lunch / Post Dinner) - After 01 Hour":
-            "< 160",
-        },
-        category: "Glucose",
-      },
-      {
         code: "BTCT",
         name: "Bleeding Time & Clotting Time",
         defaultPrice: 400.0,
@@ -479,7 +469,7 @@ export class DataManager {
         estimatedCost: 105.0,
         unit: "mg/dL",
         referenceRange: {
-          "Blood Urea Nitrogen (BUN)": "7.0 - 20.0",
+          BUN: " ",
         },
         category: "Biochemistry",
       },
@@ -700,6 +690,19 @@ export class DataManager {
         },
         category: "Renal",
       },
+      {
+  code: "BSS",
+  name: "Blood for BSS",
+  defaultPrice: 450.0,
+  estimatedCost: 135.0,
+  unit: "mg/dL",
+  referenceRange: {
+    "After 1 Hour": "< 160",
+    "After 2 Hours": "< 140",
+  },
+  category: "Glucose",
+  hasMultipleMealOptions: true,
+}
     ];
   }
 
