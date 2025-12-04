@@ -180,9 +180,9 @@ export default function ReportDetailsPage() {
             return <div key={testCode}>{renderBSSResults(resultsArray)}</div>;
           } else {
             return (
-               <div key={testCode}>
-      {renderRegularTestResults(testCode, resultsArray)}
-    </div>
+              <div key={testCode}>
+                {renderRegularTestResults(testCode, resultsArray)}
+              </div>
             );
           }
         })}
@@ -227,7 +227,7 @@ export default function ReportDetailsPage() {
           <Badge variant="outline" className="text-lg px-3 py-1">
             OGTT
           </Badge>
-          <div className="font-semibold text-lg">
+          <div className=" font-medium text-lg">
             Oral Glucose Tolerance Test
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function ReportDetailsPage() {
         <div className="overflow-x-auto mb-6">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-collapse border-t-2 border-b-2 border-gray-900">
+              <tr className="border-collapse border-t-2 border-b-[2px] border-gray-900">
                 <th className="text-left font-semibold">Test</th>
                 <th className="text-right font-semibold">Result</th>
                 <th className="text-right font-semibold">Units</th>
@@ -249,12 +249,16 @@ export default function ReportDetailsPage() {
                   .trim();
                 return (
                   <tr key={index} className="border-0 font-mono p-0 table-row">
-                    <td className="py-0 font-mono">{displayName}</td>
-                    <td className="text-right py-0 font-mono">
+                    <td className="py-0 font-mono border-b border-gray-200">
+                      {displayName}
+                    </td>
+                    <td className="text-right py-0 font-mono border-b border-gray-200">
                       {result.value}
                     </td>
-                    <td className="text-right py-0 font-mono">{result.unit}</td>
-                    <td className="text-right py-0 font-mono">
+                    <td className="text-right py-0 font-mono border-b border-gray-200">
+                      {result.unit}
+                    </td>
+                    <td className="text-right py-0 font-mono border-b border-gray-200">
                       {result.referenceRange}
                     </td>
                   </tr>
@@ -278,97 +282,91 @@ export default function ReportDetailsPage() {
     );
   };
 
-const renderPPBSResults = (ppbsResults: any[]) => {
-  console.log("=== RENDERING PPBS RESULTS ===");
-  console.log("PPBS Results:", ppbsResults);
-
-  return (
-    <div key="PPBS" className="border rounded-lg p-6">
-      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-        Post Prandial Blood Sugar
-      </h1>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left p-4">Description</th>
-            <th className="text-left p-4">Result</th>
-            <th className="text-left p-4">Units</th>
-            <th className="text-left p-4">Reference Range</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ppbsResults.map((result, index) => (
-            <tr key={index} className="border-b">
-              <td className="p-4">
-                <div className="font-medium">{result.testName}</div>
-                {result.mealType && result.hourType && (
-                  <div className="text-md mt-1">
-                    ({result.mealType} / {result.hourType})
-                  </div>
-                )}
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.value}</div>
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.unit}</div>
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.referenceRange}</div>
-              </td>
+  const renderPPBSResults = (ppbsResults: any[]) => {
+    return (
+      <div key="PPBS" className="border rounded-lg p-6">
+        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+          Post Prandial Blood Sugar
+        </h1>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left p-4">Description</th>
+              <th className="text-left p-4">Result</th>
+              <th className="text-left p-4">Units</th>
+              <th className="text-left p-4">Reference Range</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+          </thead>
+          <tbody>
+            {ppbsResults.map((result, index) => (
+              <tr key={index} className="border-b">
+                <td className="p-4">
+                  <div className="font-medium">{result.testName}</div>
+                  {result.mealType && result.hourType && (
+                    <div className="text-md mt-1">
+                      ({result.mealType} / {result.hourType})
+                    </div>
+                  )}
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.value}</div>
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.unit}</div>
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.referenceRange}</div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
-const renderBSSResults = (bssResults: any[]) => {
-  console.log("=== RENDERING BSS RESULTS ===");
-  console.log("BSS Results:", bssResults);
-
-  return (
-    <div key="BSS" className="border rounded-lg p-6">
-      <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
-        Blood for BSS
-      </h1>
-      <table className="w-full border-collapse">
-        <thead>
-          <tr className="border-b">
-            <th className="text-left p-4">Description</th>
-            <th className="text-left p-4">Result</th>
-            <th className="text-left p-4">Units</th>
-            <th className="text-left p-4">Reference Range</th>
-          </tr>
-        </thead>
-        <tbody>
-          {bssResults.map((result, index) => (
-            <tr key={index} className="border-b">
-              <td className="p-4">
-                <div className="font-medium">{result.testName}</div>
-                {result.mealType && result.hourType && (
-                  <div className="text-md mt-1">
-                    ({result.mealType} / {result.hourType})
-                  </div>
-                )}
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.value}</div>
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.unit}</div>
-              </td>
-              <td className="p-4">
-                <div className="text-lg">{result.referenceRange}</div>
-              </td>
+  const renderBSSResults = (bssResults: any[]) => {
+    return (
+      <div key="BSS" className="border rounded-lg p-6">
+        <h1 className="font-semibold text-xl text-center mb-3 border-black border-b-2">
+          Blood for BSS
+        </h1>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="border-b">
+              <th className="text-left p-4">Description</th>
+              <th className="text-left p-4">Result</th>
+              <th className="text-left p-4">Units</th>
+              <th className="text-left p-4">Reference Range</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-};
+          </thead>
+          <tbody>
+            {bssResults.map((result, index) => (
+              <tr key={index} className="border-b">
+                <td className="p-4">
+                  <div className="font-medium">{result.testName}</div>
+                  {result.mealType && result.hourType && (
+                    <div className="text-md mt-1">
+                      ({result.mealType} / {result.hourType})
+                    </div>
+                  )}
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.value}</div>
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.unit}</div>
+                </td>
+                <td className="p-4">
+                  <div className="text-lg">{result.referenceRange}</div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   const renderFBCResults = (fbcResults: any[]) => {
     const mainParams = fbcResults.filter((result) =>
@@ -574,20 +572,44 @@ const renderBSSResults = (bssResults: any[]) => {
     const isTSH = testCode === "TSH";
     const isHBA1C = testCode === "HBA1C";
     const isBUN = testCode === "BUN";
-     const isVDRL = testCode === "VDRL";
-     const isHIV = testCode === "HIV";
-     const isHCG = testCode === "HCG";
-     const isDEN = testCode === "DEN";
-     const isFT3 = testCode === "FT3";
-     const isFER = testCode === "FER";
-     const isHBsAg = testCode === "HBsAg";
-     const isHCGU = testCode === "HCGU";
-     const isUKB = testCode === "UKB";
-     const isDNS1 = testCode === "DNS1";
-     const isWIDAL = testCode === "WIDAL";
-     const isUACR = testCode === "UACR";
-    const hideReferenceRange = isESR || isTSH || isHBA1C || isBUN || isVDRL || isHIV || isHCG || isDEN || isFT3 || isFER || isHBsAg || isHCGU || isUKB || isDNS1 || isWIDAL || isUACR;
-    const hideunits = isHIV || isHCG || isDEN || isHBsAg || isHCGU || isUKB || isDNS1 || isWIDAL;
+    const isVDRL = testCode === "VDRL";
+    const isHIV = testCode === "HIV";
+    const isHCG = testCode === "HCG";
+    const isDEN = testCode === "DEN";
+    const isFT3 = testCode === "FT3";
+    const isFER = testCode === "FER";
+    const isHBsAg = testCode === "HBsAg";
+    const isHCGU = testCode === "HCGU";
+    const isUKB = testCode === "UKB";
+    const isDNS1 = testCode === "DNS1";
+    const isWIDAL = testCode === "WIDAL";
+    const isUACR = testCode === "UACR";
+    const hideReferenceRange =
+      isESR ||
+      isTSH ||
+      isHBA1C ||
+      isBUN ||
+      isVDRL ||
+      isHIV ||
+      isHCG ||
+      isDEN ||
+      isFT3 ||
+      isFER ||
+      isHBsAg ||
+      isHCGU ||
+      isUKB ||
+      isDNS1 ||
+      isWIDAL ||
+      isUACR;
+    const hideunits =
+      isHIV ||
+      isHCG ||
+      isDEN ||
+      isHBsAg ||
+      isHCGU ||
+      isUKB ||
+      isDNS1 ||
+      isWIDAL;
 
     return (
       <div key={testCode}>
@@ -599,72 +621,85 @@ const renderBSSResults = (bssResults: any[]) => {
             <tr className="border-b">
               <th className="text-left p-4">Test</th>
               <th className="text-left p-4">Value</th>
-              {!hideunits && (<th className="text-left p-4">Units</th>)}
+              {!hideunits && <th className="text-left p-4">Units</th>}
               {!hideReferenceRange && (
                 <th className="text-left p-4">Reference Range</th>
               )}
             </tr>
           </thead>
           <tbody>
-  {testResults.map((result, index) => {
-    const isQualitative = testConfig?.isQualitative || false;
+            {testResults.map((result, index) => {
+              const isQualitative = testConfig?.isQualitative || false;
 
-    const displayName = result.testName;
-    return (
-      <tr key={`${testCode}-${index}`} className="border-b">
-        <td className="p-4">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">{displayName}</span>
-          </div>
-        </td>
-        <td className="p-4">
-          <div className="text-lg">
-            {isVDRL || isHIV || isHCG || isDEN || isHBsAg || isHCGU || isUKB || isDNS1 || isWIDAL ? (
-              // For VDRL, show only the comments (Reactive/Non-Reactive)
-              <span className="font-semibold">{result.comments}</span>
-            ) : (
-              <>
-                {result.value}
-                {isQualitative && result.comments && (
-                  <span className="ml-2">({result.comments})</span>
-                )}
-              </>
-            )}
-          </div>
-        </td>
-        {!hideunits && (
-          <td className="p-4">
-            <div className="text-lg">{result.unit}</div>
-          </td>
-        )}
-        {!hideReferenceRange && (
-  <td className="p-4">
-    <div className="text-md">
-      {(() => {
-        // Check if referenceRange is an object with nested values (like Man/Woman)
-        try {
-          const parsed = typeof result.referenceRange === 'string' 
-            ? JSON.parse(result.referenceRange) 
-            : result.referenceRange;
-          
-          if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
-            // Format nested reference ranges (e.g., Man: 13.0-18.0, Woman: 11.0-16.5)
-            return Object.entries(parsed)
-              .map(([key, value]) => `${key}: ${value}`)
-              .join(', ');
-          }
-          return result.referenceRange;
-        } catch {
-          return result.referenceRange;
-        }
-      })()}
-    </div>
-  </td>
-)}
-      </tr>
-    );
-  })}
-</tbody>
+              const displayName = result.testName;
+              return (
+                <tr key={`${testCode}-${index}`} className="border-b">
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium">{displayName}</span>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <div className="text-lg">
+                      {isVDRL ||
+                      isHIV ||
+                      isHCG ||
+                      isDEN ||
+                      isHBsAg ||
+                      isHCGU ||
+                      isUKB ||
+                      isDNS1 ||
+                      isWIDAL ? (
+                        // For VDRL, show only the comments (Reactive/Non-Reactive)
+                        <span className="font-semibold">{result.comments}</span>
+                      ) : (
+                        <>
+                          {result.value}
+                          {isQualitative && result.comments && (
+                            <span className="ml-2">({result.comments})</span>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </td>
+                  {!hideunits && (
+                    <td className="p-4">
+                      <div className="text-lg">{result.unit}</div>
+                    </td>
+                  )}
+                  {!hideReferenceRange && (
+                    <td className="p-4">
+                      <div className="text-md">
+                        {(() => {
+                          // Check if referenceRange is an object with nested values (like Man/Woman)
+                          try {
+                            const parsed =
+                              typeof result.referenceRange === "string"
+                                ? JSON.parse(result.referenceRange)
+                                : result.referenceRange;
+
+                            if (
+                              typeof parsed === "object" &&
+                              parsed !== null &&
+                              !Array.isArray(parsed)
+                            ) {
+                              // Format nested reference ranges (e.g., Man: 13.0-18.0, Woman: 11.0-16.5)
+                              return Object.entries(parsed)
+                                .map(([key, value]) => `${key}: ${value}`)
+                                .join(", ");
+                            }
+                            return result.referenceRange;
+                          } catch {
+                            return result.referenceRange;
+                          }
+                        })()}
+                      </div>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
         </table>
       </div>
     );
@@ -708,259 +743,279 @@ const renderBSSResults = (bssResults: any[]) => {
 
   return (
     <div>
-   <style jsx global>{`
-  @media print {
-    body {
-      font-size: 8px;
-      margin: 0;
-      padding: 0;
-    }
-    .table-row {
-      padding: 0px !important;
-      margin: 0px !important;
-    }
-    .no-print {
-      display: none !important;
-    }
-    .print-break {
-      page-break-after: always;
-    }
-    @page {
-      margin: 15px;
-      size: A4;
-    }
+      <style jsx global>{`
+        @media print {
+          body {
+            font-size: 8px;
+            margin: 0;
+            padding: 0;
+          }
+          .table-row {
+            padding: 0px !important;
+            margin: 0px !important;
+          }
+          .no-print {
+            display: none !important;
+          }
+          .print-break {
+            page-break-after: always;
+          }
+          @page {
+            margin: 15px;
+            size: A4;
+          }
 
-    [class*="CardHeader"] {
-      display: none !important;
-    }
-    header {
-      display: none !important;
-    }
-    .display {
-      display: none !important;
-    }
-    .print\\:shadow-none > div:first-child {
-      display: none !important;
-    }
+          [class*="CardHeader"] {
+            display: none !important;
+          }
+          header {
+            display: none !important;
+          }
+          .display {
+            display: none !important;
+          }
+          .print\\:shadow-none > div:first-child {
+            display: none !important;
+          }
 
-    .print\\:shadow-none {
-      box-shadow: none !important;
-      border: none !important;
-    }
+          .print\\:shadow-none {
+            box-shadow: none !important;
+            border: none !important;
+          }
 
-    .max-w-4xl.mx-auto.print\\:max-w-none {
-      border: none !important;
-      box-shadow: none !important;
-    }
+          .max-w-4xl.mx-auto.print\\:max-w-none {
+            border: none !important;
+            box-shadow: none !important;
+          }
 
-    .space-y-6 {
-      border: none !important;
-    }
+          .space-y-6 {
+            border: none !important;
+          }
 
-    [class*="CardContent"] {
-      border: none !important;
-    }
+          [class*="CardContent"] {
+            border: none !important;
+          }
 
-    .bg-gray-50.p-4.rounded-sm.border {
-      background-color: #f9fafb !important;
-      padding: 6px !important;
+          .bg-gray-50.p-4.rounded-sm.border {
+            background-color: #f9fafb !important;
+            padding: 6px !important;
+            margin-bottom: 8px !important;
+          }
+
+          h3 {
+            font-size: 11px;
+            font-weight: bold;
+            margin-bottom: 2px;
+            margin-top: 2px;
+            color: #374151;
+          }
+
+          h1.font-semibold.text-xl.text-center {
+            display: block !important;
+            font-size: 16px !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+            margin-bottom: 8px !important;
+            border-bottom: 2px solid #000 !important;
+            padding-bottom: 4px !important;
+          }
+
+          .border.rounded-lg .flex.items-center.gap-2 {
+            justify-content: center !important;
+            margin-bottom: 4px !important;
+            margin-top: 2px !important;
+            width: 100% !important;
+          }
+
+          .border.rounded-lg .flex.items-center.gap-2 > [class*="Badge"],
+          .border.rounded-lg .flex.items-center.gap-2 > [class*="badge"],
+          .border.rounded-lg .flex.items-center.gap-2 > *:first-child {
+            display: none !important;
+          }
+
+          .border.rounded-lg
+            .flex.items-center.gap-2
+            > span:not([class*="badge"]):not([class*="Badge"]) {
+            font-size: 16px !important;
+            font-weight: 900 !important;
+            text-align: center !important;
+            background-color: #f3f4f6 !important;
+            border-radius: 3px !important;
+            letter-spacing: 0.5px !important;
+          }
+
+          /* SCOPED TABLE STYLES - Only for report tables, not TestAdditionalDetails */
+          .space-y-6 > div:not(.mt-8) table {
+            font-size: 14px;
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 2px;
+          }
+          .space-y-6 > div:not(.mt-8) th,
+          .space-y-6 > div:not(.mt-8) td {
+            vertical-align: middle;
+          }
+          .space-y-6 > div:not(.mt-8) th {
+            background-color: #f8f9fa !important;
+            font-weight: bold !important;
+            font-size: 16px !important;
+            text-align: center !important;
+            padding: 0px !important;
+          }
+          .space-y-6 > div:not(.mt-8) td {
+            font-family: Menlo, Monaco, Consolas, "Liberation Mono",
+              "Courier New", monospace;
+          }
+
+          .space-y-6 > div:not(.mt-8) th:first-child,
+          .space-y-6 > div:not(.mt-8) td:first-child {
+            text-align: left !important;
+            width: 30%;
+            padding: 0px !important;
+          }
+          .space-y-6 > div:not(.mt-8) th:nth-child(2),
+          .space-y-6 > div:not(.mt-8) td:nth-child(2) {
+            text-align: center !important;
+            width: 15%;
+            padding: 0px !important;
+          }
+          .space-y-6 > div:not(.mt-8) th:nth-child(3),
+          .space-y-6 > div:not(.mt-8) td:nth-child(3) {
+            text-align: center !important;
+            width: 15%;
+            padding: 0px !important;
+          }
+          .space-y-6 > div:not(.mt-8) th:nth-child(4),
+          .space-y-6 > div:not(.mt-8) td:nth-child(4) {
+            text-align: center !important;
+            width: 25%;
+            padding: 0px !important;
+          }
+          .space-y-6 > div:not(.mt-8) th:nth-child(5),
+          .space-y-6 > div:not(.mt-8) td:nth-child(5) {
+            text-align: center !important;
+            width: 15%;
+            padding: 0px !important;
+          }
+
+          .border.rounded-lg h4 {
+            display: block !important;
+            font-size: 16px !important;
+            font-weight: bold !important;
+            margin: 2px 0 2px 0 !important;
+            color: #374151 !important;
+            background-color: #f3f4f6 !important;
+            padding: 6px 0px !important;
+            border-radius: 2px !important;
+            text-align: left !important;
+          }
+
+          .border.rounded-lg .mb-6:nth-child(4) table thead {
+            display: none !important;
+          }
+
+          .border.rounded-lg .mb-6:nth-child(6) table thead {
+            display: none !important;
+          }
+
+          .border.rounded-lg .mb-6 + hr + .mb-6 table thead,
+          .border.rounded-lg .mb-6 + hr + .mb-6 + hr + .mb-6 table thead {
+            display: none !important;
+          }
+
+          .border.rounded-lg hr {
+            display: none !important;
+          }
+
+          .border.rounded-lg .mb-6:not(:first-child) {
+            margin-bottom: 0 !important;
+          }
+
+          .border.rounded-lg {
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            background: transparent !important;
+          }
+
+          .badge,
+          [class*="badge"] {
+            font-size: 14px !important;
+            padding: 4px 8px !important;
+            background-color: #f3f4f6 !important;
+            border: 1px solid #e5e7eb !important;
+            color: #374151 !important;
+            border-radius: 3px !important;
+          }
+
+          [class*="bg-red"],
+          [class*="destructive"] {
+            background-color: #ef4444 !important;
+            color: #ffffff !important;
+            font-size: 14px !important;
+            padding: 4px 8px !important;
+            font-weight: bold !important;
+            border-radius: 3px !important;
+          }
+
+          .text-muted-foreground {
+            color: #6b7280 !important;
+            font-size: 8px !important;
+            text: left !important;
+          }
+          .font-medium,
+          .font-semibold {
+            font-weight: bold !important;
+          }
+
+          hr,
+          .border-t,
+          .border-b {
+            border-color: #d1d5db !important;
+            margin: 1px 0 !important;
+          }
+
+          .text-center.text-sm.text-muted-foreground {
+            font-size: 8px !important;
+            color: #9ca3af !important;
+            margin-top: 12px !important;
+            padding-top: 8px !important;
+            border-top: 1px solid #e0e0e0 !important;
+          }
+
+          .recharts-responsive-container {
+            page-break-inside: avoid !important;
+            display: block !important;
+            margin-top: 20px !important;
+            margin-bottom: 20px !important;
+          }
+
+          .space-y-4 {
+            display: block !important;
+          }
+            .ogtt-section .flex.items-center.gap-2 {
       margin-bottom: 8px !important;
     }
 
-    h3 {
-      font-size: 11px;
-      font-weight: bold;
-      margin-bottom: 2px;
-      margin-top: 2px;
-      color: #374151;
+    .ogtt-section .flex.items-center.gap-2 > [class*="Badge"],
+    .ogtt-section .flex.items-center.gap-2 > [class*="badge"] {
+      display: none !important;
     }
 
-    h1.font-semibold.text-xl.text-center {
-      display: block !important;
+    .ogtt-section .flex.items-center.gap-2 > .font-semibold {
       font-size: 16px !important;
-      font-weight: 900 !important;
+      font-weight: 700 !important; /* Reduced from 900 */
       text-align: center !important;
-      margin-bottom: 8px !important;
-      border-bottom: 2px solid #000 !important;
-      padding-bottom: 4px !important;
-    }
-
-    .border.rounded-lg .flex.items-center.gap-2 {
-      justify-content: center !important;
-      margin-bottom: 4px !important;
-      margin-top: 2px !important;
       width: 100% !important;
     }
 
-    .border.rounded-lg .flex.items-center.gap-2 > [class*="Badge"],
-    .border.rounded-lg .flex.items-center.gap-2 > [class*="badge"],
-    .border.rounded-lg .flex.items-center.gap-2 > *:first-child {
-      display: none !important;
+    /* Reduce border thickness for OGTT table */
+    .ogtt-section table td {
+      border-bottom: 0.5px solid #e5e7eb !important; /* Thinner border */
     }
-
-    .border.rounded-lg
-      .flex.items-center.gap-2
-      > span:not([class*="badge"]):not([class*="Badge"]) {
-      font-size: 16px !important;
-      font-weight: 900 !important;
-      text-align: center !important;
-      background-color: #f3f4f6 !important;
-      border-radius: 3px !important;
-      letter-spacing: 0.5px !important;
-    }
-
-    /* SCOPED TABLE STYLES - Only for report tables, not TestAdditionalDetails */
-    .space-y-6 > div:not(.mt-8) table {
-      font-size: 14px;
-      border-collapse: collapse;
-      width: 100%;
-      margin-bottom: 2px;
-    }
-    .space-y-6 > div:not(.mt-8) th,
-    .space-y-6 > div:not(.mt-8) td {
-      vertical-align: middle;
-    }
-    .space-y-6 > div:not(.mt-8) th {
-      background-color: #f8f9fa !important;
-      font-weight: bold !important;
-      font-size: 16px !important;
-      text-align: center !important;
-      padding: 0px !important;
-    }
-    .space-y-6 > div:not(.mt-8) td {
-      font-family: Menlo, Monaco, Consolas, "Liberation Mono",
-        "Courier New", monospace;
-    }
-
-    .space-y-6 > div:not(.mt-8) th:first-child,
-    .space-y-6 > div:not(.mt-8) td:first-child {
-      text-align: left !important;
-      width: 30%;
-      padding: 0px !important;
-    }
-    .space-y-6 > div:not(.mt-8) th:nth-child(2),
-    .space-y-6 > div:not(.mt-8) td:nth-child(2) {
-      text-align: center !important;
-      width: 15%;
-      padding: 0px !important;
-    }
-    .space-y-6 > div:not(.mt-8) th:nth-child(3),
-    .space-y-6 > div:not(.mt-8) td:nth-child(3) {
-      text-align: center !important;
-      width: 15%;
-      padding: 0px !important;
-    }
-    .space-y-6 > div:not(.mt-8) th:nth-child(4),
-    .space-y-6 > div:not(.mt-8) td:nth-child(4) {
-      text-align: center !important;
-      width: 25%;
-      padding: 0px !important;
-    }
-    .space-y-6 > div:not(.mt-8) th:nth-child(5),
-    .space-y-6 > div:not(.mt-8) td:nth-child(5) {
-      text-align: center !important;
-      width: 15%;
-      padding: 0px !important;
-    }
-
-    .border.rounded-lg h4 {
-      display: block !important;
-      font-size: 16px !important;
-      font-weight: bold !important;
-      margin: 2px 0 2px 0 !important;
-      color: #374151 !important;
-      background-color: #f3f4f6 !important;
-      padding: 6px 0px !important;
-      border-radius: 2px !important;
-      text-align: left !important;
-    }
-
-    .border.rounded-lg .mb-6:nth-child(4) table thead {
-      display: none !important;
-    }
-
-    .border.rounded-lg .mb-6:nth-child(6) table thead {
-      display: none !important;
-    }
-
-    .border.rounded-lg .mb-6 + hr + .mb-6 table thead,
-    .border.rounded-lg .mb-6 + hr + .mb-6 + hr + .mb-6 table thead {
-      display: none !important;
-    }
-
-    .border.rounded-lg hr {
-      display: none !important;
-    }
-
-    .border.rounded-lg .mb-6:not(:first-child) {
-      margin-bottom: 0 !important;
-    }
-
-    .border.rounded-lg {
-      border: none !important;
-      border-radius: 0 !important;
-      padding: 0 !important;
-      margin: 0 !important;
-      background: transparent !important;
-    }
-
-    .badge,
-    [class*="badge"] {
-      font-size: 14px !important;
-      padding: 4px 8px !important;
-      background-color: #f3f4f6 !important;
-      border: 1px solid #e5e7eb !important;
-      color: #374151 !important;
-      border-radius: 3px !important;
-    }
-
-    [class*="bg-red"],
-    [class*="destructive"] {
-      background-color: #ef4444 !important;
-      color: #ffffff !important;
-      font-size: 14px !important;
-      padding: 4px 8px !important;
-      font-weight: bold !important;
-      border-radius: 3px !important;
-    }
-
-    .text-muted-foreground {
-      color: #6b7280 !important;
-      font-size: 8px !important;
-      text: left !important;
-    }
-    .font-medium,
-    .font-semibold {
-      font-weight: bold !important;
-    }
-
-    hr,
-    .border-t,
-    .border-b {
-      border-color: #d1d5db !important;
-      margin: 1px 0 !important;
-    }
-
-    .text-center.text-sm.text-muted-foreground {
-      font-size: 8px !important;
-      color: #9ca3af !important;
-      margin-top: 12px !important;
-      padding-top: 8px !important;
-      border-top: 1px solid #e0e0e0 !important;
-    }
-
-    .recharts-responsive-container {
-      page-break-inside: avoid !important;
-      display: block !important;
-      margin-top: 20px !important;
-      margin-bottom: 20px !important;
-    }
-
-    .space-y-4 {
-      display: block !important;
-    }
-  }
-`}</style>
+        }
+      `}</style>
       <div className="space-y-6">
         <div className="flex items-center gap-4 no-print">
           <Button asChild variant="outline" size="icon">
@@ -1095,22 +1150,28 @@ const renderBSSResults = (bssResults: any[]) => {
             </div>
 
             <div>
-  {renderTestResults(report.results)}
-  
-  {/* Show Additional Details only if there's a single unique test code */}
-  {(() => {
-    const uniqueTestCodes = [...new Set(report.results.map(r => r.testCode))];
-    const shouldShowAdditionalDetails = 
-      uniqueTestCodes.length === 1 && 
-      !['FBC', 'UFR', 'OGTT', 'PPBS', 'BSS'].includes(uniqueTestCodes[0]);
-    
-    return shouldShowAdditionalDetails ? (
-      <div className="mt-8">
-        <TestAdditionalDetails testCode={uniqueTestCodes[0].toLowerCase()} />
-      </div>
-    ) : null;
-  })()}
-</div>
+              {renderTestResults(report.results)}
+
+              {/* Show Additional Details only if there's a single unique test code */}
+              {(() => {
+                const uniqueTestCodes = [
+                  ...new Set(report.results.map((r) => r.testCode)),
+                ];
+                const shouldShowAdditionalDetails =
+                  uniqueTestCodes.length === 1 &&
+                  !["FBC", "UFR", "OGTT", "PPBS", "BSS"].includes(
+                    uniqueTestCodes[0]
+                  );
+
+                return shouldShowAdditionalDetails ? (
+                  <div className="mt-8">
+                    <TestAdditionalDetails
+                      testCode={uniqueTestCodes[0].toLowerCase()}
+                    />
+                  </div>
+                ) : null;
+              })()}
+            </div>
 
             {report.doctorRemarks && (
               <>

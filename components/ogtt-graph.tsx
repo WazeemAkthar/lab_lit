@@ -96,7 +96,7 @@ export const OGTTGraph: React.FC<OGTTGraphProps> = ({ fasting, afterOneHour, aft
     <div className="w-full ogtt-graph-container print-preserve">
       <div>
         <div className="flex items-center justify-between">
-          <span>Oral Glucose Tolerance Test (OGTT)</span>
+          <div className=' text-md'>Oral Glucose Tolerance Test (OGTT)</div>
           <span className="text-sm font-normal px-3 py-1 rounded-full" style={{ backgroundColor: status.color, color: 'white' }}>
             {status.text}
           </span>
