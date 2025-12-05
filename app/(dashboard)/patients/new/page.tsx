@@ -1,94 +1,114 @@
-"use client"
+"use client";
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { ArrowLeft, Save, User, Phone, Stethoscope, FileText } from "lucide-react"
-import { DataManager } from "@/lib/data-manager"
-import { useAuth } from "@/components/auth-provider"
-import Link from "next/link"
+import type React from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowLeft,
+  Save,
+  User,
+  Phone,
+  Stethoscope,
+  FileText,
+} from "lucide-react";
+import { DataManager } from "@/lib/data-manager";
+import { useAuth } from "@/components/auth-provider";
+import Link from "next/link";
 
 export default function NewPatientPage() {
-  const router = useRouter()
-  const { user, loading: authLoading } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const [saving, setSaving] = useState(false)
+  const router = useRouter();
+  const { user, loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
-    age: "",
+    ageYears: "",
+    ageMonths: "",
     gender: "",
     phone: "",
     doctorName: "",
     notes: "",
-  })
+  });
 
   useEffect(() => {
-    if (authLoading) return
+    if (authLoading) return;
 
     if (!user) {
-      router.push("/")
-      return
+      router.push("/");
+      return;
     }
 
-    setLoading(false)
-  }, [user, authLoading, router])
+    setLoading(false);
+  }, [user, authLoading, router]);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }))
-  }
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setSaving(true)
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
 
-  try {
-    console.log("[v0] Starting patient creation with data:", formData)
-    const dataManager = DataManager.getInstance()
-    console.log("[v0] DataManager instance obtained")
+    try {
+      console.log("[v0] Starting patient creation with data:", formData);
+      const dataManager = DataManager.getInstance();
+      console.log("[v0] DataManager instance obtained");
 
-    const nameParts = formData.fullName.trim().split(" ")
-    const firstName = nameParts[0] || ""
-    const lastName = nameParts.slice(1).join(" ") || ""
+      const nameParts = formData.fullName.trim().split(" ");
+      const firstName = nameParts[0] || "";
+      const lastName = nameParts.slice(1).join(" ") || "";
 
-    const patient = await dataManager.addPatient({
-      firstName,
-      lastName,
-      age: Number.parseInt(formData.age),
-      gender: formData.gender as "Male" | "Female" | "Other",
-      phone: formData.phone,
-      email: "",
-      doctorName: formData.doctorName,
-      notes: formData.notes,
-      name: "",
-    })
+      const patient = await dataManager.addPatient({
+        firstName,
+        lastName,
+        age: Number.parseInt(formData.ageYears || "0"),
+        ageMonths: Number.parseInt(formData.ageMonths || "0"),
+        gender: formData.gender as "Male" | "Female" | "Other",
+        phone: formData.phone,
+        email: "",
+        doctorName: formData.doctorName,
+        notes: formData.notes,
+        name: "",
+      });
 
-
-    // Redirect to new report page with patient ID
-    router.push(`/reports/new?patientId=${patient.id}`)
-  } catch (error) {
-    console.error("Error saving patient:", error)
-    alert("Error saving patient. Please try again.")
-  } finally {
-    setSaving(false)
-  }
-}
+      // Redirect to new report page with patient ID
+      router.push(`/reports/new?patientId=${patient.id}`);
+    } catch (error) {
+      console.error("Error saving patient:", error);
+      alert("Error saving patient. Please try again.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const isFormValid = () => {
-    return formData.fullName.trim() && formData.gender
-  }
+    return formData.fullName.trim() && formData.gender;
+  };
 
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-teal-50 to-cyan-50">
         <div className="animate-spin rounded-full h-12 w-12 border-4 border-teal-200 border-t-teal-600"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -110,7 +130,9 @@ const handleSubmit = async (e: React.FormEvent) => {
             <h1 className="text-4xl font-bold bg-gradient-to-r from-teal-600 to-cyan-600 bg-clip-text text-transparent">
               Add New Patient
             </h1>
-            <p className="text-slate-600 mt-1">Register a new patient in the system</p>
+            <p className="text-slate-600 mt-1">
+              Register a new patient in the system
+            </p>
           </div>
         </div>
 
@@ -135,42 +157,80 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <User className="h-4 w-4" />
                   <span>Personal Details</span>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="fullName" className="text-slate-700 font-medium">
+                  <Label
+                    htmlFor="fullName"
+                    className="text-slate-700 font-medium"
+                  >
                     Full Name <span className="text-red-500">*</span>
                   </Label>
                   <Input
                     id="fullName"
                     value={formData.fullName}
-                    onChange={(e) => handleInputChange("fullName", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("fullName", e.target.value)
+                    }
                     placeholder="Enter full name"
                     required
                     className="border-teal-200 focus:border-teal-500 focus:ring-teal-500 h-11"
                   />
                 </div>
 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-4 md:grid-cols-3">
                   <div className="space-y-2">
-                    <Label htmlFor="age" className="text-slate-700 font-medium">
-                      Age
+                    <Label
+                      htmlFor="ageYears"
+                      className="text-slate-700 font-medium"
+                    >
+                      Age (Years)
                     </Label>
                     <Input
-                      id="age"
+                      id="ageYears"
                       type="number"
                       min="0"
                       max="150"
-                      value={formData.age}
-                      onChange={(e) => handleInputChange("age", e.target.value)}
-                      placeholder="Enter age"
+                      value={formData.ageYears}
+                      onChange={(e) =>
+                        handleInputChange("ageYears", e.target.value)
+                      }
+                      placeholder="Years"
                       className="border-teal-200 focus:border-teal-500 focus:ring-teal-500 h-11"
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="gender" className="text-slate-700 font-medium">
+                    <Label
+                      htmlFor="ageMonths"
+                      className="text-slate-700 font-medium"
+                    >
+                      Age (Months)
+                    </Label>
+                    <Input
+                      id="ageMonths"
+                      type="number"
+                      min="0"
+                      max="11"
+                      value={formData.ageMonths}
+                      onChange={(e) =>
+                        handleInputChange("ageMonths", e.target.value)
+                      }
+                      placeholder="Months"
+                      className="border-teal-200 focus:border-teal-500 focus:ring-teal-500 h-11"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="gender"
+                      className="text-slate-700 font-medium"
+                    >
                       Gender <span className="text-red-500">*</span>
                     </Label>
-                    <Select value={formData.gender} onValueChange={(value) => handleInputChange("gender", value)}>
+                    <Select
+                      value={formData.gender}
+                      onValueChange={(value) =>
+                        handleInputChange("gender", value)
+                      }
+                    >
                       <SelectTrigger className="border-teal-200 focus:border-teal-500 focus:ring-teal-500 h-11">
                         <SelectValue placeholder="Select gender" />
                       </SelectTrigger>
@@ -190,7 +250,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <Phone className="h-4 w-4" />
                   <span>Contact Information</span>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="phone" className="text-slate-700 font-medium">
                     Phone Number
@@ -212,15 +272,20 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <Stethoscope className="h-4 w-4" />
                   <span>Medical Information</span>
                 </div>
-                
+
                 <div className="space-y-2">
-                  <Label htmlFor="doctorName" className="text-slate-700 font-medium">
+                  <Label
+                    htmlFor="doctorName"
+                    className="text-slate-700 font-medium"
+                  >
                     Referring Doctor
                   </Label>
                   <Input
                     id="doctorName"
                     value={formData.doctorName}
-                    onChange={(e) => handleInputChange("doctorName", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("doctorName", e.target.value)
+                    }
                     placeholder="Enter doctor's name (optional)"
                     className="border-emerald-200 focus:border-emerald-500 focus:ring-emerald-500 h-11"
                   />
@@ -233,7 +298,7 @@ const handleSubmit = async (e: React.FormEvent) => {
                   <FileText className="h-4 w-4" />
                   <span>Additional Notes</span>
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="notes" className="text-slate-700 font-medium">
                     Notes
@@ -273,5 +338,5 @@ const handleSubmit = async (e: React.FormEvent) => {
         </form>
       </div>
     </div>
-  )
+  );
 }

@@ -1093,23 +1093,32 @@ export default function ReportDetailsPage() {
       </div>
     </div>
     <div className="grid grid-cols-2">
-      <div className="flex">
-        <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-          Age
-        </span>
-        <span className="text-sm text-gray-900 uppercase">
-          :&nbsp;&nbsp;&nbsp;{patient?.age} years
-        </span>
-      </div>
-      <div className="flex">
-        <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-          Patient ID
-        </span>
-        <span className="text-sm text-gray-900 uppercase">
-          :&nbsp;&nbsp;&nbsp;{report.patientId}
-        </span>
-      </div>
-    </div>
+  <div className="flex">
+    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
+      Age
+    </span>
+    <span className="text-sm text-gray-900 uppercase">
+      :&nbsp;&nbsp;&nbsp;
+      {patient?.age && patient.age > 0 ? `${patient.age} years` : ''}
+      {patient?.ageMonths && patient.ageMonths > 0 
+        ? (patient?.age && patient.age > 0 ? ` ${patient.ageMonths} months` : `${patient.ageMonths} months`)
+        : ''
+      }
+      {(!patient?.age || patient.age === 0) && (!patient?.ageMonths || patient.ageMonths === 0) 
+        ? 'N/A' 
+        : ''
+      }
+    </span>
+  </div>
+  <div className="flex">
+    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
+      Patient ID
+    </span>
+    <span className="text-sm text-gray-900 uppercase">
+      :&nbsp;&nbsp;&nbsp;{report.patientId}
+    </span>
+  </div>
+</div>
     <div className="grid grid-cols-2">
       <div className="flex">
         <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
