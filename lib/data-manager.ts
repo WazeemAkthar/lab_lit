@@ -9,6 +9,7 @@ export interface Patient {
   firstName: string;
   lastName: string;
   age: number;
+  ageMonths?: number 
   gender: "Male" | "Female" | "Other";
   phone: string;
   email: string;
