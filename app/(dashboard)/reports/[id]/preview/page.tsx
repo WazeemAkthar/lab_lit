@@ -3,23 +3,18 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { ArrowLeft, Download, Printer as Print, Edit } from "lucide-react";
+import { Download, ArrowLeft } from "lucide-react";
 import {
   DataManager,
   type Report,
   type TestCatalogItem,
 } from "@/lib/data-manager";
-import { generateReportPDF } from "@/lib/pdf-generator";
 import { useAuth } from "@/components/auth-provider";
-import Link from "next/link";
-import ReportQRCode from "@/components/ReportQRCode";
 import TestAdditionalDetails from "@/components/TestAdditionalDetails";
 import { OGTTGraph } from "@/components/ogtt-graph";
 
-export default function ReportDetailsPage() {
+export default function PDFPreviewPage() {
   const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
@@ -32,6 +27,99 @@ export default function ReportDetailsPage() {
     Record<string, TestCatalogItem>
   >({});
 
+  const [letterheadBase64, setLetterheadBase64] = useState<string>("");
+  const [letterheadLoaded, setLetterheadLoaded] = useState(false);
+  const [letterheadError, setLetterheadError] = useState<string>("");
+
+  const [signatureBase64, setSignatureBase64] = useState<string>("");
+  const [signatureLoaded, setSignatureLoaded] = useState(false);
+
+  useEffect(() => {
+    // Load letterhead image and convert to base64
+    const loadLetterheadAsBase64 = async () => {
+      try {
+        // First, try loading from public folder (most reliable in Next.js)
+        const publicPath = "/letterhead.png";
+
+        try {
+          const response = await fetch(publicPath);
+          if (response.ok) {
+            const blob = await response.blob();
+
+            return new Promise<void>((resolve, reject) => {
+              const reader = new FileReader();
+
+              reader.onloadend = () => {
+                const base64data = reader.result as string;
+                console.log("Base64 data length:", base64data.length);
+                console.log("Base64 preview:", base64data.substring(0, 50));
+                setLetterheadBase64(base64data);
+                setLetterheadLoaded(true);
+                setLetterheadError("");
+                console.log(
+                  "✅ Letterhead loaded successfully from public folder"
+                );
+                resolve();
+              };
+
+              reader.onerror = () => {
+                reject(new Error("FileReader error"));
+              };
+
+              reader.readAsDataURL(blob);
+            });
+          }
+        } catch (e) {
+          console.log("Failed to load from public folder:", e);
+        }
+
+        // If public folder fails, show error
+        throw new Error("Letterhead not found");
+      } catch (error) {
+        console.error("❌ Could not load letterhead image:", error);
+        setLetterheadLoaded(false);
+        setLetterheadError("Place letterhead.png in /public folder");
+      }
+    };
+
+    loadLetterheadAsBase64();
+  }, []);
+
+  useEffect(() => {
+    // Load signature image and convert to base64
+    const loadSignatureAsBase64 = async () => {
+      try {
+        const response = await fetch("/signature.png");
+        if (response.ok) {
+          const blob = await response.blob();
+
+          return new Promise<void>((resolve, reject) => {
+            const reader = new FileReader();
+
+            reader.onloadend = () => {
+              const base64data = reader.result as string;
+              console.log("✅ Signature loaded successfully");
+              setSignatureBase64(base64data);
+              setSignatureLoaded(true);
+              resolve();
+            };
+
+            reader.onerror = () => {
+              reject(new Error("FileReader error"));
+            };
+
+            reader.readAsDataURL(blob);
+          });
+        }
+      } catch (error) {
+        console.log("ℹ️ Signature image not found (optional)");
+        setSignatureLoaded(false);
+      }
+    };
+
+    loadSignatureAsBase64();
+  }, []);
+
   useEffect(() => {
     if (authLoading) return;
 
@@ -40,7 +128,6 @@ export default function ReportDetailsPage() {
       return;
     }
 
-    // Load report data
     async function loadReportData() {
       const dataManager = DataManager.getInstance();
       const allReports = await dataManager.getReports();
@@ -53,13 +140,11 @@ export default function ReportDetailsPage() {
 
       setReport(reportData);
 
-      // Get patient data
       const patientData = await dataManager.getPatientById(
         reportData.patientId
       );
       setPatient(patientData);
 
-      // FIXED: Load all test configurations
       const configs: Record<string, TestCatalogItem> = {};
       const uniqueTestCodes = [
         ...new Set(reportData.results.map((r) => r.testCode)),
@@ -79,57 +164,45 @@ export default function ReportDetailsPage() {
     loadReportData();
   }, [reportId, user, authLoading, router]);
 
-  const handlePrint = () => {
-    const reportContent = document.querySelector(".print-content");
-    if (!reportContent) {
-      console.error("Report content not found");
-      return;
-    }
+  const handleDownloadPDF = async () => {
+    try {
+      // Show loading state
+      const loadingDiv = document.createElement("div");
+      loadingDiv.id = "pdf-loading";
+      loadingDiv.style.cssText =
+        "position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); z-index: 9999; font-family: sans-serif;";
+      loadingDiv.innerHTML =
+        '<div style="text-align: center;"><div style="margin-bottom: 10px;">Generating PDF...</div><div style="width: 200px; height: 4px; background: #e5e7eb; border-radius: 2px; overflow: hidden;"><div style="width: 30%; height: 100%; background: #3b82f6; animation: loading 1.5s ease-in-out infinite;"></div></div></div><style>@keyframes loading { 0%, 100% { transform: translateX(0); } 50% { transform: translateX(233%); } }</style>';
+      document.body.appendChild(loadingDiv);
 
-    const printWindow = window.open("", "_blank");
-    if (!printWindow) {
-      console.error("Could not open print window");
-      return;
-    }
+      const element = document.querySelector(".pdf-page") as HTMLElement;
+      if (!element) {
+        document.body.removeChild(loadingDiv);
+        alert("PDF content not found");
+        return;
+      }
 
-    const styles = Array.from(document.styleSheets)
-      .map((styleSheet) => {
-        try {
-          return Array.from(styleSheet.cssRules)
-            .map((rule) => rule.cssText)
-            .join("");
-        } catch (e) {
-          console.log("Cannot access stylesheet");
-          return "";
+      // Use window.print() as the most reliable method
+      window.print();
+
+      // Remove loading indicator after a short delay
+      setTimeout(() => {
+        const loadingElement = document.getElementById("pdf-loading");
+        if (loadingElement) {
+          document.body.removeChild(loadingElement);
         }
-      })
-      .join("");
-
-    printWindow.document.write(`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>Lab Report - ${report?.id ?? ""}</title>
-        <style>
-          ${styles}
-        </style>
-      </head>
-      <body>
-        ${reportContent.innerHTML}
-      </body>
-      </html>
-    `);
-
-    printWindow.document.close();
-    printWindow.onload = () => {
-      printWindow.print();
-      printWindow.close();
-    };
+      }, 1000);
+    } catch (error) {
+      console.error("Error generating PDF:", error);
+      const loadingElement = document.getElementById("pdf-loading");
+      if (loadingElement) {
+        document.body.removeChild(loadingElement);
+      }
+      alert(
+        `Error: ${error instanceof Error ? error.message : "Unknown error"}`
+      );
+    }
   };
-
-const handleDownloadPDF = async () => {
-  router.push(`/reports/${reportId}/preview`);
-};
 
   const renderTestResults = (results: any[]) => {
     const groupedResults = results.reduce((groups, result) => {
@@ -144,8 +217,6 @@ const handleDownloadPDF = async () => {
     return (
       <div className="space-y-6">
         {Object.entries(groupedResults).map(([testCode, testResults]) => {
-          console.log(`Rendering testCode: ${testCode}, results:`, testResults);
-
           const resultsArray = testResults as any[];
           if (testCode === "FBC") {
             return <div key={testCode}>{renderFBCResults(resultsArray)}</div>;
@@ -184,15 +255,6 @@ const handleDownloadPDF = async () => {
     const oneHourValue = oneHourResult?.value || "";
     const twoHoursValue = twoHoursResult?.value || "";
 
-    console.log(
-      "Values extracted - Fasting:",
-      fastingValue,
-      "1H:",
-      oneHourValue,
-      "2H:",
-      twoHoursValue
-    );
-
     return (
       <div
         key="OGTT"
@@ -209,7 +271,7 @@ const handleDownloadPDF = async () => {
         <div className="overflow-x-auto mb-6">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-collapse border-t-2 border-b-[2px] border-gray-900">
+              <tr className="border-collapse border-t-2 border-b-2 border-gray-900">
                 <th className="text-left font-semibold">Test</th>
                 <th className="text-right font-semibold">Result</th>
                 <th className="text-right font-semibold">Units</th>
@@ -242,7 +304,6 @@ const handleDownloadPDF = async () => {
           </table>
         </div>
 
-        {/* Graph Section */}
         {(fastingValue || oneHourValue || twoHoursValue) && (
           <div className="mt-6 ogtt-graph-wrapper">
             <OGTTGraph
@@ -398,7 +459,7 @@ const handleDownloadPDF = async () => {
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className=" border-collapse border-t-2 border-b-2 border-gray-900">
+              <tr className="border-collapse border-t-2 border-b-2 border-gray-900">
                 <th className="text-left font-semibold">Parameter</th>
                 <th className="text-right font-semibold">Result</th>
                 <th className="text-right font-semibold">Units</th>
@@ -635,7 +696,6 @@ const handleDownloadPDF = async () => {
           <tbody>
             {testResults.map((result, index) => {
               const isQualitative = testConfig?.isQualitative || false;
-
               const displayName = result.testName;
               return (
                 <tr key={`${testCode}-${index}`} className="border-b">
@@ -655,7 +715,6 @@ const handleDownloadPDF = async () => {
                       isUKB ||
                       isDNS1 ||
                       isWIDAL ? (
-                        // For VDRL, show only the comments (Reactive/Non-Reactive)
                         <span className="font-semibold">{result.comments}</span>
                       ) : (
                         <>
@@ -676,7 +735,6 @@ const handleDownloadPDF = async () => {
                     <td className="p-1">
                       <div className="">
                         {(() => {
-                          // Check if referenceRange is an object with nested values (like Man/Woman)
                           try {
                             const parsed =
                               typeof result.referenceRange === "string"
@@ -688,7 +746,6 @@ const handleDownloadPDF = async () => {
                               parsed !== null &&
                               !Array.isArray(parsed)
                             ) {
-                              // Format nested reference ranges (e.g., Man: 13.0-18.0, Woman: 11.0-16.5)
                               return Object.entries(parsed)
                                 .map(([key, value]) => `${key}: ${value}`)
                                 .join(", ");
@@ -730,7 +787,7 @@ const handleDownloadPDF = async () => {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary display"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
   }
@@ -739,136 +796,172 @@ const handleDownloadPDF = async () => {
     return (
       <div className="text-center py-12">
         <h1 className="text-2xl font-bold mb-4">Report Not Found</h1>
-        <Button asChild>
-          <Link href="/reports">Back to Reports</Link>
-        </Button>
       </div>
     );
   }
 
   return (
-    <div>
+    <div className="pdf-preview-container">
       <style jsx global>{`
+        @media screen {
+          .pdf-preview-container {
+            background: #525659;
+            min-height: 100vh;
+            padding: 20px;
+          }
+
+          .pdf-page {
+            background: white;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            padding: 0;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+          }
+
+          .pdf-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-image: ${letterheadLoaded
+              ? `url('${letterheadBase64}')`
+              : "none"};
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: top center;
+            pointer-events: none;
+            z-index: 0;
+          }
+
+          .pdf-content {
+            position: relative;
+            z-index: 1;
+            padding: ${letterheadLoaded ? "2.18in 3mm 2mm 3mm" : "15mm"};
+            background: transparent;
+          }
+
+          .action-buttons {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+          }
+
+          /* Hide all navigation elements in PDF view */
+          .pdf-page nav,
+          .pdf-page header,
+          .pdf-page aside,
+          .pdf-page [role="navigation"],
+          .pdf-page button:not(.action-buttons button) {
+            display: none !important;
+          }
+          .signatureimg {
+            margin-right: 100px;
+          }
+        }
+
         @media print {
-          body {
-            font-size: 8px;
+          * {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          body * {
+            visibility: hidden;
+          }
+          .signatureimg {
+            margin-right: 100px;
+          }
+          .pdf-page,
+          .pdf-page * {
+            visibility: visible;
+          }
+
+          .pdf-page {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 210mm;
+            min-height: 297mm;
             margin: 0;
             padding: 0;
+            box-shadow: none;
+            overflow: visible;
           }
-          .table-row {
-            padding: 0px !important;
-            margin: 0px !important;
+
+          .pdf-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-image: ${letterheadLoaded
+              ? `url('${letterheadBase64}')`
+              : "none"};
+            background-size: 100% auto;
+            background-repeat: no-repeat;
+            background-position: top center;
+            pointer-events: none;
+            z-index: 0;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
-          .no-print {
+
+          .pdf-content {
+            position: relative;
+            z-index: 1;
+            padding: ${letterheadLoaded ? "2.18in 3mm 2mm 3mm" : "15mm"};
+            background: transparent;
+          }
+
+          /* Hide all UI elements */
+          .action-buttons,
+          .no-print,
+          nav,
+          header,
+          aside,
+          [role="navigation"],
+          button {
             display: none !important;
+            visibility: hidden !important;
           }
-          .print-break {
-            page-break-after: always;
-          }
+
           @page {
-            margin: 15px;
             size: A4;
+            margin: 0;
           }
 
-          [class*="CardHeader"] {
-            display: none !important;
-          }
-          header {
-            display: none !important;
-          }
-          .display {
-            display: none !important;
-          }
-          .print\\:shadow-none > div:first-child {
-            display: none !important;
+          .space-y-1.border-t.border-black.font-mono,
+          .space-y-1.border-t.border-black.font-mono * {
+            font-family: "Courier New", Courier, monospace !important;
+            color: #000000 !important;
           }
 
-          .print\\:shadow-none {
-            box-shadow: none !important;
-            border: none !important;
-          }
-
-          .max-w-4xl.mx-auto.print\\:max-w-none {
-            border: none !important;
-            box-shadow: none !important;
-          }
-
-          .space-y-6 {
-            border: none !important;
-          }
-
-          [class*="CardContent"] {
-            border: none !important;
-          }
-
-          .bg-gray-50.p-4.rounded-sm.border {
-            background-color: #f9fafb !important;
-            padding: 6px !important;
-            margin-bottom: 8px !important;
-          }
-
-          h3 {
-            font-size: 11px;
-            font-weight: bold;
-            margin-bottom: 2px;
-            margin-top: 2px;
-            color: #374151;
-          }
-
-          h1.font-semibold.text-xl.text-center {
-            display: block !important;
-            font-size: 16px !important;
-            font-weight: 900 !important;
-            text-align: center !important;
-            margin-bottom: 8px !important;
-            border-bottom: 2px solid #000 !important;
-            padding-bottom: 4px !important;
-          }
-
-          .border.rounded-lg .flex.items-center.gap-2 {
-            justify-content: center !important;
-            margin-bottom: 4px !important;
-            margin-top: 2px !important;
-            width: 100% !important;
-          }
-
-          .border.rounded-lg .flex.items-center.gap-2 > [class*="Badge"],
-          .border.rounded-lg .flex.items-center.gap-2 > [class*="badge"],
-          .border.rounded-lg .flex.items-center.gap-2 > *:first-child {
-            display: none !important;
-          }
-
-          .border.rounded-lg
-            .flex.items-center.gap-2
-            > span:not([class*="badge"]):not([class*="Badge"]) {
-            font-size: 16px !important;
-            font-weight: 900 !important;
-            text-align: center !important;
-            background-color: #f3f4f6 !important;
-            border-radius: 3px !important;
-            letter-spacing: 0.5px !important;
-          }
-
-          /* SCOPED TABLE STYLES - Only for report tables, not TestAdditionalDetails */
           .space-y-6 > div:not(.mt-8) table {
             font-size: 14px;
             border-collapse: collapse;
             width: 100%;
             margin-bottom: 2px;
           }
-          .space-y-6 > div:not(.mt-8) th,
-          .space-y-6 > div:not(.mt-8) td {
-            vertical-align: middle;
-          }
+
           .space-y-6 > div:not(.mt-8) th {
             background-color: #f8f9fa !important;
             font-weight: 600 !important;
-            // font-size: 16px !important;
             text-align: center !important;
             padding: 0px !important;
             border-bottom: 1px solid #000 !important;
-          }
-          .space-y-6 > div:not(.mt-8) td {
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
           .space-y-6 > div:not(.mt-8) th:first-child,
@@ -877,310 +970,134 @@ const handleDownloadPDF = async () => {
             width: 30%;
             padding: 0px !important;
           }
-          .space-y-6 > div:not(.mt-8) th:nth-child(2),
-          .space-y-6 > div:not(.mt-8) td:nth-child(2) {
-            text-align: center !important;
-            width: 15%;
-            padding: 0px !important;
-          }
-          .space-y-6 > div:not(.mt-8) th:nth-child(3),
-          .space-y-6 > div:not(.mt-8) td:nth-child(3) {
-            text-align: center !important;
-            width: 15%;
-            padding: 0px !important;
-          }
-          .space-y-6 > div:not(.mt-8) th:nth-child(4),
-          .space-y-6 > div:not(.mt-8) td:nth-child(4) {
-            text-align: center !important;
-            width: 25%;
-            padding: 0px !important;
-          }
-          .space-y-6 > div:not(.mt-8) th:nth-child(5),
-          .space-y-6 > div:not(.mt-8) td:nth-child(5) {
-            text-align: center !important;
-            width: 15%;
-            padding: 0px !important;
-          }
 
-          .border.rounded-lg h4 {
-            display: block !important;
-            font-size: 16px !important;
-            font-weight: bold !important;
-            margin: 2px 0 2px 0 !important;
-            color: #374151 !important;
-            background-color: #f3f4f6 !important;
-            padding: 6px 0px !important;
-            border-radius: 2px !important;
-            text-align: left !important;
-          }
-
-          .border.rounded-lg .mb-6:nth-child(4) table thead {
-            display: none !important;
-          }
-
-          .border.rounded-lg .mb-6:nth-child(6) table thead {
-            display: none !important;
-          }
-
-          .border.rounded-lg .mb-6 + hr + .mb-6 table thead,
-          .border.rounded-lg .mb-6 + hr + .mb-6 + hr + .mb-6 table thead {
-            display: none !important;
-          }
-
-          .border.rounded-lg hr {
-            display: none !important;
-          }
-
-          .border.rounded-lg .mb-6:not(:first-child) {
-            margin-bottom: 0 !important;
-          }
-
-          .border.rounded-lg {
-            border: none !important;
-            border-radius: 0 !important;
-            padding: 0 !important;
-            margin: 0 !important;
-            background: transparent !important;
-          }
-
-          .badge,
-          [class*="badge"] {
-            font-size: 14px !important;
-            padding: 4px 8px !important;
-            background-color: #f3f4f6 !important;
-            border: 1px solid #e5e7eb !important;
-            color: #374151 !important;
-            border-radius: 3px !important;
-          }
-
-          [class*="bg-red"],
-          [class*="destructive"] {
-            background-color: #ef4444 !important;
-            color: #ffffff !important;
-            font-size: 14px !important;
-            padding: 4px 8px !important;
-            font-weight: bold !important;
-            border-radius: 3px !important;
-          }
-
-          .text-muted-foreground {
-            color: #6b7280 !important;
-            font-size: 8px !important;
-            text: left !important;
-          }
-          .font-medium,
-          .font-semibold {
-            font-weight: bold !important;
-          }
-
-          hr,
-          .border-t,
-          .border-b {
-            // border-color: #d1d5db !important;
-            margin: 1px 0 !important;
-          }
-
-          .text-center.text-sm.text-muted-foreground {
-            font-size: 8px !important;
-            color: #9ca3af !important;
-            margin-top: 12px !important;
-            padding-top: 8px !important;
-            border-top: 1px solid #e0e0e0 !important;
-          }
-
-          /* Patient header information with Courier New font */
-          .space-y-1.border-t.border-black.font-mono,
-          .space-y-1.border-t.border-black.font-mono * {
-            font-family: "Courier New", Courier, monospace !important;
-            color: #000000 !important;
-          }
-
-          .recharts-responsive-container {
-            page-break-inside: avoid !important;
-            display: block !important;
-            margin-top: 20px !important;
-            margin-bottom: 20px !important;
-          }
-
-          .space-y-4 {
-            display: block !important;
-          }
-          .ogtt-section .flex.items-center.gap-2 {
-            margin-bottom: 8px !important;
-          }
-
-          .ogtt-section .flex.items-center.gap-2 > [class*="Badge"],
-          .ogtt-section .flex.items-center.gap-2 > [class*="badge"] {
-            display: none !important;
-          }
-
-          .ogtt-section .flex.items-center.gap-2 > .font-semibold {
-            font-size: 16px !important;
-            font-weight: 700 !important; /* Reduced from 900 */
-            text-align: center !important;
-            width: 100% !important;
-          }
-
-          /* Reduce border thickness for OGTT table */
-          .ogtt-section table td {
-            border-bottom: 0.5px solid #e5e7eb !important; /* Thinner border */
-          }
-          .font-bold,
-          .font-semibold,
-          .font-medium {
-            font-weight: 500 !important;
+          /* Ensure table borders print correctly */
+          table,
+          th,
+          td {
+            border-color: #000 !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
         }
       `}</style>
-      <div className="space-y-6">
-        <div className="flex items-center gap-4 no-print">
-          <Button asChild variant="outline" size="icon">
-            <Link href="/reports">
-              <ArrowLeft className="h-4 w-4" />
-            </Link>
-          </Button>
-          <div className="flex-1">
-            <h1 className="text-3xl font-bold">Report {report.id}</h1>
-            <p className="text-muted-foreground">
-              Generated on {new Date(report.createdAt).toLocaleDateString()}
-            </p>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button variant="outline" onClick={handlePrint}>
-              <Print className="h-4 w-4 mr-2" />
-              Print
-            </Button>
-            <Button variant="outline" onClick={handleDownloadPDF}>
-              <Download className="h-4 w-4 mr-2" />
-              Download PDF
-            </Button>
-            {/* <Button variant="outline">
-              <Edit className="h-4 w-4 mr-2" />
-              Edit
-            </Button> */}
-          </div>
-        </div>
 
-        <Card className="print:shadow-none max-w-4xl mx-auto print:max-w-none print-content">
-          <CardHeader className="pb-6 border-b-2 border-gray-300 display">
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-2xl mb-2 font-bold text-gray-800">
-                  Azza Medical Laboratory Services
-                </CardTitle>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <div>Unique Place for all Diagnostic needs</div>
-                  <div>Phone: 0752537178, 0776452417, 0753274455</div>
-                  <div>Email: azzaarafath@gmail.com</div>
-                </div>
-              </div>
-              <div className="text-right">
-                <Badge
-                  variant="default"
-                  className="text-lg px-4 py-2 bg-gray-700 text-white font-bold"
-                >
-                  Laboratory Report
-                </Badge>
-              </div>
-            </div>
-          </CardHeader>
+      <div className="action-buttons no-print">
+        <Button variant="outline" onClick={() => router.back()}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back
+        </Button>
+        <Button onClick={handleDownloadPDF}>
+          <Download className="h-4 w-4 mr-2" />
+          Save as PDF
+        </Button>
+        {letterheadLoaded && (
+          <div className="text-green-600 text-sm bg-white px-3 py-2 rounded shadow max-w-xs">
+            ✅ Letterhead loaded
+          </div>
+        )}
+        {!letterheadLoaded && letterheadError && (
+          <div className="text-yellow-600 text-sm bg-white px-3 py-2 rounded shadow max-w-xs">
+            ⚠️ {letterheadError}
+          </div>
+        )}
+      </div>
 
-          <CardContent className="space-y-3 p-3">
-            <div className="">
-              <div className="space-y-1 border-t border-black font-mono">
-                <div className="grid grid-cols-2">
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Patient Name
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{report.patientName}
-                    </span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Report ID
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{report.id}
-                    </span>
-                  </div>
+      <div className="pdf-page">
+        <div className="pdf-content">
+          <div className="space-y-3">
+            <div className="space-y-1 border-t border-black font-mono">
+              <div className="grid grid-cols-2">
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Patient Name
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{report.patientName}
+                  </span>
                 </div>
-                <div className="grid grid-cols-2">
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Age
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;
-                      {patient?.age && patient.age > 0
-                        ? `${patient.age} years`
-                        : ""}
-                      {patient?.ageMonths && patient.ageMonths > 0
-                        ? patient?.age && patient.age > 0
-                          ? ` ${patient.ageMonths} months`
-                          : `${patient.ageMonths} months`
-                        : ""}
-                      {(!patient?.age || patient.age === 0) &&
-                      (!patient?.ageMonths || patient.ageMonths === 0)
-                        ? "N/A"
-                        : ""}
-                    </span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Patient ID
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{report.patientId}
-                    </span>
-                  </div>
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Report ID
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{report.id}
+                  </span>
                 </div>
-                <div className="grid grid-cols-2">
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Gender
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{patient?.gender}
-                    </span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Report Date
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;
-                      {new Date(report.createdAt).toLocaleDateString()}
-                    </span>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2">
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Phone
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{patient?.phone}
-                    </span>
-                  </div>
-                  <div className="flex">
-                    <span className="text-sm text-gray-900 w-32 flex-shrink-0 text-left uppercase">
-                      Ref By
-                    </span>
-                    <span className="text-sm text-gray-900 uppercase">
-                      :&nbsp;&nbsp;&nbsp;{patient?.doctorName}
-                    </span>
-                  </div>
-                </div>
-                <div className="border-t border-black"></div>
               </div>
+              <div className="grid grid-cols-2">
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Age
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;
+                    {patient?.age && patient.age > 0
+                      ? `${patient.age} years`
+                      : ""}
+                    {patient?.ageMonths && patient.ageMonths > 0
+                      ? patient?.age && patient.age > 0
+                        ? ` ${patient.ageMonths} months`
+                        : `${patient.ageMonths} months`
+                      : ""}
+                    {(!patient?.age || patient.age === 0) &&
+                    (!patient?.ageMonths || patient.ageMonths === 0)
+                      ? "N/A"
+                      : ""}
+                  </span>
+                </div>
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Patient ID
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{report.patientId}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2">
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Gender
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{patient?.gender}
+                  </span>
+                </div>
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Report Date
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;
+                    {new Date(report.createdAt).toLocaleDateString()}
+                  </span>
+                </div>
+              </div>
+              <div className="grid grid-cols-2">
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Phone
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{patient?.phone}
+                  </span>
+                </div>
+                <div className="flex">
+                  <span className="text-sm text-gray-900 w-32 shrink-0 text-left uppercase">
+                    Ref By
+                  </span>
+                  <span className="text-sm text-gray-900 uppercase">
+                    :&nbsp;&nbsp;&nbsp;{patient?.doctorName}
+                  </span>
+                </div>
+              </div>
+              <div className="border-t border-black"></div>
             </div>
 
             <div>
               {renderTestResults(report.results)}
 
-              {/* Show Additional Details only if there's a single unique test code */}
               {(() => {
                 const uniqueTestCodes = [
                   ...new Set(report.results.map((r) => r.testCode)),
@@ -1202,20 +1119,30 @@ const handleDownloadPDF = async () => {
             </div>
 
             {report.doctorRemarks && (
-              <>
-                <Separator />
-                <div>
-                  <h3 className="font-semibold mb-2">Remarks:</h3>
-                  <p className="text-sm">{report.doctorRemarks}</p>
-                </div>
-              </>
+              <div>
+                <h3 className="font-semibold mb-2">Remarks:</h3>
+                <p className="text-sm">{report.doctorRemarks}</p>
+              </div>
             )}
 
             <p className="font-normal text-center text-xs">
               -- End of Report --
             </p>
-          </CardContent>
-        </Card>
+
+            {signatureLoaded && (
+              <div className="mt-8 flex justify-end">
+                <div className="text-center">
+                  <img
+                    src={signatureBase64}
+                    alt="Signature"
+                    className="h-16 w-auto mb-1 signatureimg"
+                    style={{ maxWidth: "150px" }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
